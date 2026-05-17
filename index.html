@@ -1,405 +1,518 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>BSIS-2B Student Portal</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Familjen+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #0a0f1e;
-      --surface: #111827;
-      --card: #1a2235;
-      --border: #2a3a5c;
-      --accent: #3b82f6;
-      --accent2: #06b6d4;
+      --bg: #060912;
+      --surface: #0d1220;
+      --card: #111827;
+      --card2: #151e2e;
+      --border: #1e2d47;
+      --border2: #253450;
+      --accent: #2563eb;
+      --accent-light: #3b82f6;
+      --cyan: #0ea5e9;
       --gold: #f59e0b;
-      --text: #e2e8f0;
-      --muted: #94a3b8;
+      --text: #f0f4ff;
+      --text2: #c8d3ea;
+      --muted: #6b7fa3;
       --danger: #ef4444;
-      --success: #10b981;
+      --success: #22c55e;
+      --radius: 16px;
+      --radius-sm: 10px;
     }
 
+    html { scroll-behavior: smooth; }
+
     body {
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
       overflow-x: hidden;
     }
 
-    /* ─── BACKGROUND MESH ─── */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 80% 60% at 20% 10%, rgba(59,130,246,.12) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 80% at 80% 90%, rgba(6,182,212,.10) 0%, transparent 60%),
-        radial-gradient(ellipse 40% 40% at 60% 40%, rgba(245,158,11,.06) 0%, transparent 50%);
-      pointer-events: none;
-      z-index: 0;
+    /* ── Ambient background ── */
+    .ambient {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      overflow: hidden;
+    }
+    .ambient-blob {
+      position: absolute; border-radius: 50%;
+      filter: blur(80px); opacity: .18;
+    }
+    .blob1 { width: 600px; height: 600px; background: var(--accent); top: -200px; left: -150px; animation: drift1 14s ease-in-out infinite alternate; }
+    .blob2 { width: 500px; height: 500px; background: var(--cyan); bottom: -150px; right: -100px; animation: drift2 16s ease-in-out infinite alternate; }
+    .blob3 { width: 300px; height: 300px; background: var(--gold); top: 40%; left: 45%; animation: drift1 18s ease-in-out 4s infinite alternate; opacity: .08; }
+
+    @keyframes drift1 { from { transform: translate(0,0) scale(1); } to { transform: translate(40px,30px) scale(1.1); } }
+    @keyframes drift2 { from { transform: translate(0,0) scale(1); } to { transform: translate(-30px,-40px) scale(1.08); } }
+
+    /* ── Page system ── */
+    .page {
+      position: fixed; inset: 0; z-index: 2;
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity .45s cubic-bezier(.4,0,.2,1), transform .45s cubic-bezier(.4,0,.2,1);
+      overflow-y: auto;
+      padding: 1.5rem 1rem;
+    }
+    .page.hidden { opacity: 0; pointer-events: none; transform: translateY(16px) scale(.98); }
+    #dashPage { align-items: flex-start; justify-content: flex-start; flex-direction: column; padding: 0; }
+
+    /* ── Shared card ── */
+    .glass-card {
+      background: linear-gradient(145deg, rgba(255,255,255,.05) 0%, rgba(255,255,255,.02) 100%);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius);
+      box-shadow: 0 24px 64px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.06);
     }
 
-    /* ─── PAGES ─── */
-    .page { position: fixed; inset: 0; z-index: 1; display: flex; align-items: center; justify-content: center; transition: opacity .5s, transform .5s; }
-    .page.hidden { opacity: 0; pointer-events: none; transform: scale(.96); }
-
-    /* ═══════════════════════════════
-       REGISTER PAGE
-    ═══════════════════════════════ */
-    #registerPage { background: transparent; }
-
-    .reg-wrapper {
-      width: 100%; max-width: 520px;
-      padding: 2rem 1rem;
-      display: flex; flex-direction: column; align-items: center; gap: 1.5rem;
-      max-height: 100vh; overflow-y: auto;
+    /* ═══════════════════════════
+        REGISTER
+    ═══════════════════════════ */
+    .reg-wrap {
+      width: 100%; max-width: 540px;
+      display: flex; flex-direction: column; align-items: center; gap: 1.2rem;
     }
 
-    .school-badge {
-      display: flex; align-items: center; gap: .75rem;
-      background: rgba(255,255,255,.04);
-      border: 1px solid var(--border);
-      border-radius: 50px;
-      padding: .45rem 1.2rem;
-      font-family: 'Syne', sans-serif;
-      font-size: .8rem; letter-spacing: .08em;
-      color: var(--muted); text-transform: uppercase;
+    .portal-pill {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: rgba(37,99,235,.12);
+      border: 1px solid rgba(37,99,235,.3);
+      border-radius: 50px; padding: .38rem 1rem;
+      font-size: .75rem; font-weight: 600; letter-spacing: .07em;
+      text-transform: uppercase; color: #93c5fd;
     }
-    .school-badge span { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); display: inline-block; box-shadow: 0 0 8px var(--accent); }
+    .portal-pill-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--accent-light);
+      box-shadow: 0 0 6px var(--accent-light);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%,100% { opacity:1; transform:scale(1); }
+      50% { opacity:.5; transform:scale(.75); }
+    }
 
     .reg-card {
       width: 100%;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 2.5rem 2rem;
-      box-shadow: 0 30px 80px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.06);
-      animation: slideUp .6s cubic-bezier(.16,1,.3,1) both;
+      padding: 2.2rem 2rem;
+      animation: fadeUp .6s cubic-bezier(.16,1,.3,1) both;
     }
 
-    @keyframes slideUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(28px); } to { opacity:1; transform:translateY(0); } }
 
-    .reg-title {
-      font-family: 'Syne', sans-serif;
-      font-size: 1.7rem; font-weight: 800;
-      background: linear-gradient(135deg, #fff 30%, var(--accent2));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      margin-bottom: .3rem;
-    }
-    .reg-sub { color: var(--muted); font-size: .88rem; margin-bottom: 1.8rem; }
+    .reg-heading { font-family: 'Familjen Grotesk', sans-serif; font-size: 1.75rem; font-weight: 700; letter-spacing: -.02em; margin-bottom: .3rem; }
+    .reg-sub { color: var(--muted); font-size: .88rem; margin-bottom: 1.8rem; line-height: 1.5; }
 
-    /* Photo upload */
-    .photo-upload {
-      display: flex; flex-direction: column; align-items: center; gap: .6rem;
-      margin-bottom: 1.5rem;
+    /* Photo uploader */
+    .photo-uploader {
+      display: flex; flex-direction: column; align-items: center; gap: .55rem;
+      margin-bottom: 1.6rem;
     }
-    .photo-circle {
-      width: 90px; height: 90px; border-radius: 50%;
-      border: 2px dashed var(--border);
+    .photo-ring {
+      width: 92px; height: 92px; border-radius: 50%;
+      border: 2px dashed var(--border2);
       background: var(--surface);
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; overflow: hidden; position: relative;
-      transition: border-color .2s;
+      transition: border-color .25s, box-shadow .25s;
     }
-    .photo-circle:hover { border-color: var(--accent); }
-    .photo-circle img { width: 100%; height: 100%; object-fit: cover; display: none; }
-    .photo-circle svg { flex-shrink: 0; }
-    .photo-label { font-size: .8rem; color: var(--muted); }
+    .photo-ring:hover { border-color: var(--accent-light); box-shadow: 0 0 0 4px rgba(59,130,246,.12); }
+    .photo-ring img { width: 100%; height: 100%; object-fit: cover; display: none; border-radius: 50%; }
+    .photo-ring-icon { color: var(--muted); transition: color .2s; }
+    .photo-ring:hover .photo-ring-icon { color: var(--accent-light); }
     #photoInput { display: none; }
+    .photo-hint { font-size: .75rem; color: var(--muted); }
 
-    /* Form fields */
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem; }
-    .form-full { grid-column: 1/-1; }
+    /* Form */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .85rem; }
+    .form-full { grid-column: 1 / -1; }
 
-    .field { display: flex; flex-direction: column; gap: .35rem; }
-    .field label { font-size: .78rem; font-weight: 500; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
+    .field { display: flex; flex-direction: column; gap: .3rem; }
+    .field label { font-size: .72rem; font-weight: 600; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+
     .field input, .field select, .field textarea {
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: .65rem .9rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: .68rem .9rem;
       color: var(--text);
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       font-size: .9rem;
       outline: none;
       transition: border-color .2s, box-shadow .2s;
       width: 100%;
+      appearance: none; -webkit-appearance: none;
     }
+    .field input::placeholder, .field textarea::placeholder { color: var(--muted); opacity: .7; }
     .field input:focus, .field select:focus, .field textarea:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(59,130,246,.15);
+      border-color: var(--accent-light);
+      box-shadow: 0 0 0 3px rgba(59,130,246,.14);
     }
-    .field select option { background: var(--surface); }
-    .field textarea { resize: none; height: 70px; }
+    .field select { cursor: pointer; }
+    .field select option { background: #111827; color: var(--text); }
+    .field textarea { resize: none; height: 72px; line-height: 1.55; }
 
-    .err-msg { color: var(--danger); font-size: .78rem; margin-top: .2rem; display: none; }
+    input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(.5); cursor: pointer; }
 
+    .field-err { color: var(--danger); font-size: .76rem; margin-top: .15rem; display: none; }
+
+    /* Divider */
+    .form-divider {
+      grid-column: 1/-1;
+      height: 1px; background: var(--border);
+      margin: .3rem 0;
+    }
+
+    /* Buttons */
     .btn-primary {
-      width: 100%; padding: .8rem;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border: none; border-radius: 12px;
-      color: #fff; font-family: 'Syne', sans-serif;
-      font-size: 1rem; font-weight: 700;
-      cursor: pointer; margin-top: 1.2rem;
+      width: 100%; padding: .82rem;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--cyan) 100%);
+      border: none; border-radius: var(--radius-sm);
+      color: #fff;
+      font-family: 'Familjen Grotesk', sans-serif;
+      font-size: 1rem; font-weight: 600; letter-spacing: .01em;
+      cursor: pointer; margin-top: 1.3rem;
+      position: relative; overflow: hidden;
       transition: opacity .2s, transform .15s, box-shadow .2s;
-      box-shadow: 0 4px 20px rgba(59,130,246,.35);
+      box-shadow: 0 4px 20px rgba(37,99,235,.4);
     }
-    .btn-primary:hover { opacity: .9; transform: translateY(-1px); box-shadow: 0 8px 30px rgba(59,130,246,.45); }
+    .btn-primary::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(rgba(255,255,255,.08), transparent);
+    }
+    .btn-primary:hover { opacity: .92; transform: translateY(-1px); box-shadow: 0 8px 30px rgba(37,99,235,.5); }
     .btn-primary:active { transform: scale(.98); }
 
-    .switch-link { text-align: center; font-size: .85rem; color: var(--muted); margin-top: .5rem; }
-    .switch-link a { color: var(--accent2); text-decoration: none; font-weight: 500; cursor: pointer; }
-    .switch-link a:hover { text-decoration: underline; }
+    .switch-txt { text-align: center; font-size: .84rem; color: var(--muted); margin-top: .65rem; }
+    .switch-lnk { color: var(--cyan); text-decoration: none; font-weight: 600; cursor: pointer; }
+    .switch-lnk:hover { text-decoration: underline; }
 
-    /* ═══════════════════════════════
-       LOGIN PAGE
-    ═══════════════════════════════ */
-    #loginPage { background: transparent; }
-
+    /* ═══════════════════════════
+        LOGIN
+    ═══════════════════════════ */
     .login-card {
       width: 100%; max-width: 420px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
       padding: 2.8rem 2.2rem;
-      box-shadow: 0 30px 80px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.06);
-      margin: 1rem;
-      animation: slideUp .6s cubic-bezier(.16,1,.3,1) both;
+      animation: fadeUp .6s cubic-bezier(.16,1,.3,1) both;
     }
 
-    .portal-icon {
-      width: 52px; height: 52px; border-radius: 14px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
+    .login-icon {
+      width: 54px; height: 54px; border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), var(--cyan));
       display: flex; align-items: center; justify-content: center;
-      margin-bottom: 1.2rem;
-      box-shadow: 0 8px 25px rgba(59,130,246,.4);
+      margin-bottom: 1.4rem;
+      box-shadow: 0 8px 28px rgba(37,99,235,.45);
     }
 
-    .login-title { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; margin-bottom: .3rem; }
+    .login-title { font-family: 'Familjen Grotesk', sans-serif; font-size: 1.65rem; font-weight: 700; letter-spacing: -.02em; margin-bottom: .3rem; }
     .login-sub { color: var(--muted); font-size: .88rem; margin-bottom: 2rem; }
 
-    /* ═══════════════════════════════
-       DASHBOARD PAGE
-    ═══════════════════════════════ */
-    #dashPage {
-      background: transparent;
-      align-items: flex-start; justify-content: flex-start;
-      flex-direction: column;
-      overflow-y: auto;
-    }
+    .login-fields { display: flex; flex-direction: column; gap: .9rem; }
 
+    .login-err {
+      color: var(--danger); font-size: .82rem;
+      min-height: 1.1rem; margin-top: .4rem;
+      display: flex; align-items: center; gap: .4rem;
+    }
+    .login-err svg { flex-shrink: 0; }
+
+    /* ═══════════════════════════
+        DASHBOARD
+    ═══════════════════════════ */
     .topbar {
       width: 100%;
       display: flex; align-items: center; justify-content: space-between;
-      padding: 1rem 2rem;
-      background: rgba(17,24,39,.8);
-      backdrop-filter: blur(12px);
+      padding: .85rem 1.5rem;
+      background: rgba(6,9,18,.85);
+      backdrop-filter: blur(16px) saturate(180%);
       border-bottom: 1px solid var(--border);
-      position: sticky; top: 0; z-index: 10;
+      position: sticky; top: 0; z-index: 20;
       flex-shrink: 0;
     }
-
-    .topbar-brand {
-      font-family: 'Syne', sans-serif;
-      font-size: 1.1rem; font-weight: 800;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    .topbar-left { display: flex; align-items: center; gap: .7rem; }
+    .topbar-logo {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent), var(--cyan));
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
     }
-
-    .topbar-right { display: flex; align-items: center; gap: 1rem; }
-    .topbar-time { font-size: .8rem; color: var(--muted); }
+    .topbar-brand { font-family: 'Familjen Grotesk', sans-serif; font-size: 1.05rem; font-weight: 700; }
+    .topbar-right { display: flex; align-items: center; gap: .75rem; }
+    .topbar-clock { font-size: .78rem; color: var(--muted); font-variant-numeric: tabular-nums; display: none; }
+    @media (min-width: 480px) { .topbar-clock { display: block; } }
 
     .btn-logout {
-      background: rgba(239,68,68,.15);
-      border: 1px solid rgba(239,68,68,.3);
-      color: var(--danger);
-      border-radius: 8px;
-      padding: .4rem .9rem;
-      font-size: .82rem; font-weight: 500;
-      cursor: pointer; font-family: 'DM Sans', sans-serif;
-      transition: background .2s;
+      display: flex; align-items: center; gap: .4rem;
+      background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.25);
+      color: #f87171; border-radius: 8px;
+      padding: .4rem .85rem; font-size: .8rem; font-weight: 600;
+      cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: background .2s, border-color .2s;
     }
-    .btn-logout:hover { background: rgba(239,68,68,.25); }
+    .btn-logout:hover { background: rgba(239,68,68,.2); border-color: rgba(239,68,68,.4); }
 
-    .dash-body { width: 100%; max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
+    .dash-scroll { width: 100%; overflow-y: auto; flex: 1; }
+    .dash-body { width: 100%; max-width: 860px; margin: 0 auto; padding: 1.5rem 1.2rem 3rem; display: flex; flex-direction: column; gap: 1.2rem; }
 
-    /* Profile hero */
-    .profile-hero {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 2rem;
-      display: flex; align-items: center; gap: 2rem;
+    /* Hero card */
+    .hero-card {
+      padding: 0;
+      overflow: hidden; position: relative;
+    }
+    .hero-banner {
+      height: 90px;
+      background: linear-gradient(135deg, #1e3a8a 0%, #0c4a6e 40%, #134e4a 100%);
       position: relative; overflow: hidden;
-      box-shadow: 0 8px 40px rgba(0,0,0,.3);
     }
-    .profile-hero::before {
+    .hero-banner::before {
       content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 4px;
-      background: linear-gradient(90deg, var(--accent), var(--accent2), var(--gold));
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(
+        45deg,
+        transparent, transparent 20px,
+        rgba(255,255,255,.025) 20px, rgba(255,255,255,.025) 21px
+      );
     }
+    .hero-banner-dots {
+      position: absolute; right: 1.5rem; top: 50%; transform: translateY(-50%);
+      display: flex; gap: .4rem;
+    }
+    .hero-banner-dots span {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: rgba(255,255,255,.2);
+    }
+    .hero-body { padding: 0 1.6rem 1.6rem; }
+    .hero-photo-row { display: flex; align-items: flex-end; justify-content: space-between; margin-top: -42px; margin-bottom: .9rem; }
+    .hero-photo-wrap { position: relative; }
 
-    .profile-photo-wrap {
-      position: relative; flex-shrink: 0;
-    }
-    .profile-photo {
-      width: 110px; height: 110px; border-radius: 50%;
+    .hero-photo-img {
+      width: 84px; height: 84px; border-radius: 50%;
       object-fit: cover;
-      border: 3px solid var(--accent);
-      box-shadow: 0 0 0 6px rgba(59,130,246,.12);
-    }
-    .profile-photo-placeholder {
-      width: 110px; height: 110px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Syne', sans-serif;
-      font-size: 2.2rem; font-weight: 800; color: #fff;
-      border: 3px solid var(--accent);
-      box-shadow: 0 0 0 6px rgba(59,130,246,.12);
-    }
-
-    .status-dot {
-      position: absolute; bottom: 6px; right: 6px;
-      width: 18px; height: 18px; border-radius: 50%;
-      background: var(--success);
       border: 3px solid var(--card);
+      box-shadow: 0 0 0 3px var(--accent), 0 4px 20px rgba(0,0,0,.5);
+      display: none;
+    }
+    .hero-photo-placeholder {
+      width: 84px; height: 84px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--cyan));
+      border: 3px solid var(--card);
+      box-shadow: 0 0 0 3px var(--accent), 0 4px 20px rgba(0,0,0,.5);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Familjen Grotesk', sans-serif;
+      font-size: 1.8rem; font-weight: 700; color: #fff;
+    }
+    .online-badge {
+      position: absolute; bottom: 4px; right: 4px;
+      width: 17px; height: 17px; border-radius: 50%;
+      background: var(--success); border: 2.5px solid var(--card);
       box-shadow: 0 0 8px var(--success);
     }
 
-    .profile-info h1 { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; }
-    .profile-info .course-tag {
-      display: inline-flex; align-items: center; gap: .4rem;
-      background: rgba(59,130,246,.15);
-      border: 1px solid rgba(59,130,246,.3);
-      border-radius: 50px;
-      padding: .25rem .8rem;
-      font-size: .78rem; color: var(--accent2);
-      margin: .5rem 0 1rem;
+    .hero-tags { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: .2rem; }
+    .tag {
+      display: inline-flex; align-items: center; gap: .3rem;
+      padding: .26rem .65rem; border-radius: 50px; font-size: .72rem; font-weight: 600;
     }
+    .tag-blue { background: rgba(37,99,235,.15); border: 1px solid rgba(37,99,235,.3); color: #93c5fd; }
+    .tag-cyan { background: rgba(14,165,233,.15); border: 1px solid rgba(14,165,233,.3); color: #7dd3fc; }
+    .tag-green { background: rgba(34,197,94,.12); border: 1px solid rgba(34,197,94,.25); color: #86efac; }
 
-    .info-pills { display: flex; flex-wrap: wrap; gap: .5rem; }
-    .pill {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: .3rem .7rem;
-      font-size: .78rem; color: var(--muted);
-      display: flex; align-items: center; gap: .4rem;
+    .hero-name { font-family: 'Familjen Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700; letter-spacing: -.02em; margin-bottom: .25rem; }
+    .hero-id { font-size: .82rem; color: var(--muted); }
+
+    /* Stats row */
+    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; }
+    .stat-card {
+      padding: 1rem 1rem 1.1rem;
+      text-align: center; cursor: default;
+      transition: border-color .25s, transform .2s;
     }
-    .pill strong { color: var(--text); }
+    .stat-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+    .stat-num {
+      font-family: 'Familjen Grotesk', sans-serif;
+      font-size: 1.65rem; font-weight: 700; letter-spacing: -.02em;
+      background: linear-gradient(135deg, var(--accent-light), var(--cyan));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      line-height: 1.1; margin-bottom: .25rem;
+    }
+    .stat-lbl { font-size: .7rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; font-weight: 600; }
 
     /* Info grid */
-    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
 
-    .info-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1.4rem;
-      box-shadow: 0 4px 20px rgba(0,0,0,.2);
-      transition: border-color .2s, transform .2s;
-    }
-    .info-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .info-panel { padding: 1.3rem; transition: border-color .25s; }
+    .info-panel:hover { border-color: var(--border2); }
+    .info-panel-full { grid-column: 1/-1; }
 
-    .info-card-label {
-      font-size: .7rem; text-transform: uppercase; letter-spacing: .08em;
-      color: var(--muted); margin-bottom: .9rem;
-      display: flex; align-items: center; gap: .4rem;
+    .panel-label {
+      font-size: .68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 1rem;
+      display: flex; align-items: center; gap: .5rem;
     }
-    .info-card-label::before {
-      content: ''; width: 20px; height: 2px;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      border-radius: 2px;
+    .panel-label-bar {
+      flex: 1; height: 1.5px;
+      background: linear-gradient(90deg, var(--border2), transparent);
     }
 
-    .info-row { display: flex; flex-direction: column; gap: .5rem; }
-    .info-item { display: flex; justify-content: space-between; align-items: flex-start; gap: .5rem; font-size: .85rem; }
-    .info-item .key { color: var(--muted); white-space: nowrap; flex-shrink: 0; }
-    .info-item .val { color: var(--text); font-weight: 500; text-align: right; word-break: break-word; }
+    .detail-list { display: flex; flex-direction: column; gap: .65rem; }
+    .detail-row { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; font-size: .84rem; }
+    .detail-key { color: var(--muted); flex-shrink: 0; font-size: .8rem; }
+    .detail-val { color: var(--text2); font-weight: 500; text-align: right; word-break: break-word; }
 
-    .bio-card { grid-column: 1/-1; }
-    .bio-text { font-size: .88rem; color: var(--muted); line-height: 1.7; font-style: italic; }
-
-    /* Stats bar */
-    .stats-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
-    .stat-box {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 1.2rem;
-      text-align: center;
-      transition: border-color .2s;
+    .bio-text { font-size: .87rem; color: var(--muted); line-height: 1.75; font-style: italic; }
+    .bio-quote {
+      font-size: 2.5rem; font-family: Georgia, serif;
+      line-height: .5; color: var(--border2); display: block; margin-bottom: .4rem;
     }
-    .stat-box:hover { border-color: var(--accent2); }
-    .stat-num { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .stat-lbl { font-size: .75rem; color: var(--muted); margin-top: .2rem; }
 
-    /* ─── Responsive ─── */
-    @media (max-width: 600px) {
-      .profile-hero { flex-direction: column; text-align: center; }
-      .info-pills { justify-content: center; }
+    /* ── Responsive ── */
+    @media (max-width: 560px) {
+      .hero-name { font-size: 1.2rem; }
       .info-grid { grid-template-columns: 1fr; }
-      .stats-bar { grid-template-columns: 1fr 1fr; }
+      .info-panel-full { grid-column: 1; }
       .form-grid { grid-template-columns: 1fr; }
-      .topbar { padding: .8rem 1rem; }
+      .form-full { grid-column: 1; }
+      .reg-card { padding: 1.8rem 1.2rem; }
+      .login-card { padding: 2rem 1.3rem; }
+      .stats-row { grid-template-columns: repeat(3,1fr); gap: .5rem; }
+      .stat-num { font-size: 1.3rem; }
+      .dash-body { padding: 1rem .8rem 2.5rem; }
     }
 
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 6px; }
+    @media (max-width: 360px) {
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .stats-row .stat-card:last-child { grid-column: 1/-1; }
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+    /* ── Toast notification ── */
+    .toast {
+      position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: var(--card2); border: 1px solid var(--border2);
+      border-radius: 50px; padding: .65rem 1.4rem;
+      font-size: .84rem; font-weight: 500; color: var(--text2);
+      box-shadow: 0 12px 40px rgba(0,0,0,.5);
+      z-index: 100; transition: transform .35s cubic-bezier(.34,1.56,.64,1), opacity .3s;
+      opacity: 0; pointer-events: none;
+      display: flex; align-items: center; gap: .5rem;
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .toast-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); flex-shrink: 0; }
   </style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════════
-     REGISTER PAGE
-══════════════════════════════════════ -->
-<div class="page" id="registerPage">
-  <div class="reg-wrapper">
-    <div class="school-badge"><span></span> BSIS-2B Student Portal</div>
+<!-- Ambient background -->
+<div class="ambient">
+  <div class="ambient-blob blob1"></div>
+  <div class="ambient-blob blob2"></div>
+  <div class="ambient-blob blob3"></div>
+</div>
 
-    <div class="reg-card">
-      <div class="reg-title">Create Account</div>
-      <div class="reg-sub">Register with your personal information to get started.</div>
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span class="toast-dot"></span>
+  <span id="toastMsg">Success</span>
+</div>
+
+<!-- ═══════════════════════════════
+     REGISTER PAGE
+═══════════════════════════════ -->
+<div class="page" id="registerPage">
+  <div class="reg-wrap">
+
+    <div class="portal-pill">
+      <span class="portal-pill-dot"></span>
+      BSIS-2B Student Portal
+    </div>
+
+    <div class="glass-card reg-card">
+      <div class="reg-heading">Create Account</div>
+      <div class="reg-sub">Register with your personal information to access your student portal.</div>
 
       <!-- Photo Upload -->
-      <div class="photo-upload">
-        <div class="photo-circle" id="photoCircle" onclick="document.getElementById('photoInput').click()">
+      <div class="photo-uploader">
+        <div class="photo-ring" id="photoRing" onclick="document.getElementById('photoInput').click()" title="Upload your photo">
           <img id="photoPreview" alt="Preview"/>
-          <svg id="photoIcon" width="30" height="30" fill="none" stroke="#94a3b8" stroke-width="1.5" viewBox="0 0 24 24">
-            <path d="M12 16c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z"/><path d="M20 4h-3.17L15 2H9L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z"/>
+          <svg class="photo-ring-icon" id="photoIcon" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
           </svg>
         </div>
         <input type="file" id="photoInput" accept="image/*" onchange="previewPhoto(this)"/>
-        <div class="photo-label">Click to upload your photo</div>
+        <div class="photo-hint">Tap to upload your profile photo</div>
       </div>
 
       <div class="form-grid">
+
+        <!-- Name -->
         <div class="field">
           <label>First Name *</label>
-          <input type="text" id="regFirstName" placeholder="Juan"/>
-          <div class="err-msg" id="errFirstName">Required</div>
+          <input type="text" id="regFirstName" placeholder="Juan" autocomplete="given-name"/>
+          <div class="field-err" id="errFirstName">First name is required</div>
         </div>
         <div class="field">
           <label>Last Name *</label>
-          <input type="text" id="regLastName" placeholder="Dela Cruz"/>
-          <div class="err-msg" id="errLastName">Required</div>
+          <input type="text" id="regLastName" placeholder="Dela Cruz" autocomplete="family-name"/>
+          <div class="field-err" id="errLastName">Last name is required</div>
         </div>
+
+        <!-- Middle name + suffix -->
+        <div class="field">
+          <label>Middle Name</label>
+          <input type="text" id="regMiddleName" placeholder="Santos" autocomplete="additional-name"/>
+        </div>
+        <div class="field">
+          <label>Suffix</label>
+          <select id="regSuffix">
+            <option value="">None</option>
+            <option>Jr.</option>
+            <option>Sr.</option>
+            <option>II</option>
+            <option>III</option>
+          </select>
+        </div>
+
+        <!-- Email -->
         <div class="field form-full">
           <label>Email Address *</label>
-          <input type="email" id="regEmail" placeholder="juan@email.com"/>
-          <div class="err-msg" id="errEmail">Enter a valid email</div>
+          <input type="email" id="regEmail" placeholder="juan.delacruz@email.com" autocomplete="email"/>
+          <div class="field-err" id="errEmail">Enter a valid email address</div>
         </div>
+
+        <div class="form-divider"></div>
+
+        <!-- Student ID -->
         <div class="field">
           <label>Student ID *</label>
           <input type="text" id="regStudentId" placeholder="2024-BSIS-001"/>
-          <div class="err-msg" id="errStudentId">Required</div>
+          <div class="field-err" id="errStudentId">Student ID is required</div>
         </div>
+        <div class="field">
+          <label>Year Level</label>
+          <select id="regYear">
+            <option value="2nd Year" selected>2nd Year</option>
+            <option value="1st Year">1st Year</option>
+            <option value="3rd Year">3rd Year</option>
+            <option value="4th Year">4th Year</option>
+          </select>
+        </div>
+
+        <!-- Personal -->
         <div class="field">
           <label>Age</label>
           <input type="number" id="regAge" placeholder="20" min="15" max="60"/>
@@ -410,289 +523,460 @@
             <option value="">Select</option>
             <option>Male</option>
             <option>Female</option>
+            <option>Non-binary</option>
             <option>Prefer not to say</option>
           </select>
         </div>
+
         <div class="field">
           <label>Birthday</label>
           <input type="date" id="regBirthday"/>
         </div>
+        <div class="field">
+          <label>Civil Status</label>
+          <select id="regCivil">
+            <option value="">Select</option>
+            <option>Single</option>
+            <option>Married</option>
+          </select>
+        </div>
+
         <div class="field form-full">
           <label>Contact Number</label>
-          <input type="tel" id="regContact" placeholder="+63 912 345 6789"/>
+          <input type="tel" id="regContact" placeholder="+63 912 345 6789" autocomplete="tel"/>
         </div>
         <div class="field form-full">
           <label>Address</label>
-          <input type="text" id="regAddress" placeholder="City, Province"/>
+          <input type="text" id="regAddress" placeholder="Barangay, City, Province" autocomplete="street-address"/>
         </div>
+
+        <div class="form-divider"></div>
+
+        <!-- Password -->
         <div class="field form-full">
           <label>Password *</label>
-          <input type="password" id="regPassword" placeholder="Create a password"/>
-          <div class="err-msg" id="errPassword">Min 6 characters</div>
+          <input type="password" id="regPassword" placeholder="Create a strong password" autocomplete="new-password"/>
+          <div class="field-err" id="errPassword">Minimum 6 characters required</div>
         </div>
         <div class="field form-full">
           <label>Confirm Password *</label>
-          <input type="password" id="regConfirm" placeholder="Repeat password"/>
-          <div class="err-msg" id="errConfirm">Passwords don't match</div>
+          <input type="password" id="regConfirm" placeholder="Repeat your password" autocomplete="new-password"/>
+          <div class="field-err" id="errConfirm">Passwords do not match</div>
         </div>
+
+        <!-- Bio -->
         <div class="field form-full">
           <label>About Me</label>
-          <textarea id="regBio" placeholder="A short bio about yourself..."></textarea>
+          <textarea id="regBio" placeholder="Write a short bio about yourself…"></textarea>
         </div>
+
       </div>
 
-      <button class="btn-primary" onclick="register()">Register &rarr;</button>
-      <div class="switch-link">Already have an account? <a onclick="showLogin()">Log in</a></div>
+      <button class="btn-primary" id="regBtn" onclick="register()">
+        Create Account &nbsp;→
+      </button>
+      <div class="switch-txt">Already have an account? <a class="switch-lnk" onclick="showLogin()">Sign in</a></div>
     </div>
+
   </div>
 </div>
 
-<!-- ══════════════════════════════════════
+<!-- ═══════════════════════════════
      LOGIN PAGE
-══════════════════════════════════════ -->
+═══════════════════════════════ -->
 <div class="page hidden" id="loginPage">
-  <div class="login-card">
-    <div class="portal-icon">
+  <div class="glass-card login-card">
+
+    <div class="login-icon">
       <svg width="26" height="26" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24">
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
-        <path d="M12 6a3 3 0 100 6 3 3 0 000-6zM6 18c0-2.67 4-4 6-4s6 1.33 6 4"/>
+        <circle cx="12" cy="8" r="4"/>
+        <path d="M4 20c0-4 3.58-7 8-7s8 3 8 7"/>
       </svg>
     </div>
 
-    <div class="login-title">Welcome Back 👋</div>
-    <div class="login-sub">Sign in to your BSIS-2B student portal.</div>
+    <div class="login-title">Welcome back 👋</div>
+    <div class="login-sub">Sign in to your BSIS-2B student portal to continue.</div>
 
-    <div class="field" style="margin-bottom:.9rem">
-      <label>Email Address</label>
-      <input type="email" id="loginEmail" placeholder="your@email.com"/>
+    <div class="login-fields">
+      <div class="field">
+        <label>Email Address</label>
+        <input type="email" id="loginEmail" placeholder="your@email.com" autocomplete="email"
+               onkeydown="if(event.key==='Enter')document.getElementById('loginPassword').focus()"/>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password"
+               onkeydown="if(event.key==='Enter')login()"/>
+      </div>
     </div>
-    <div class="field">
-      <label>Password</label>
-      <input type="password" id="loginPassword" placeholder="••••••••"/>
-    </div>
-    <div class="err-msg" id="loginErr" style="display:block; margin-top:.5rem; min-height:1.1rem;"></div>
 
-    <button class="btn-primary" onclick="login()">Sign In &rarr;</button>
-    <div class="switch-link" style="margin-top:.8rem">No account yet? <a onclick="showRegister()">Register</a></div>
+    <div class="login-err" id="loginErr">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:none" id="loginErrIcon">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span id="loginErrTxt"></span>
+    </div>
+
+    <button class="btn-primary" onclick="login()">Sign In &nbsp;→</button>
+    <div class="switch-txt" style="margin-top:.7rem">No account yet? <a class="switch-lnk" onclick="showRegister()">Register here</a></div>
+
   </div>
 </div>
 
-<!-- ══════════════════════════════════════
+<!-- ═══════════════════════════════
      DASHBOARD PAGE
-══════════════════════════════════════ -->
+═══════════════════════════════ -->
 <div class="page hidden" id="dashPage">
 
   <div class="topbar">
-    <div class="topbar-brand">BSIS-2B Portal</div>
+    <div class="topbar-left">
+      <div class="topbar-logo">
+        <svg width="17" height="17" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+          <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+        </svg>
+      </div>
+      <div class="topbar-brand">BSIS-2B Portal</div>
+    </div>
     <div class="topbar-right">
-      <div class="topbar-time" id="clockEl"></div>
-      <button class="btn-logout" onclick="logout()">Log Out</button>
+      <div class="topbar-clock" id="clockEl"></div>
+      <button class="btn-logout" onclick="logout()">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Log Out
+      </button>
     </div>
   </div>
 
+  <div class="dash-scroll">
   <div class="dash-body">
 
-    <!-- Profile Hero -->
-    <div class="profile-hero">
-      <div class="profile-photo-wrap">
-        <div class="profile-photo-placeholder" id="dashPhotoPlaceholder"></div>
-        <img class="profile-photo" id="dashPhoto" style="display:none" alt="Profile Photo"/>
-        <div class="status-dot"></div>
+    <!-- Hero -->
+    <div class="glass-card hero-card">
+      <div class="hero-banner">
+        <div class="hero-banner-dots">
+          <span></span><span></span><span></span>
+        </div>
       </div>
-      <div class="profile-info">
-        <h1 id="dashName">—</h1>
-        <div class="course-tag">
-          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-          Bachelor of Science in Information Systems · 2nd Year
+      <div class="hero-body">
+        <div class="hero-photo-row">
+          <div class="hero-photo-wrap">
+            <div class="hero-photo-placeholder" id="dashAvatarPlaceholder"></div>
+            <img class="hero-photo-img" id="dashAvatarImg" alt="Profile photo"/>
+            <div class="online-badge"></div>
+          </div>
+          <div class="hero-tags">
+            <span class="tag tag-blue">BSIS</span>
+            <span class="tag tag-cyan" id="dashYearTag">2nd Year</span>
+            <span class="tag tag-green">Section 2B</span>
+          </div>
         </div>
-        <div class="info-pills">
-          <div class="pill" id="dashIdPill"><strong id="dashId">—</strong></div>
-          <div class="pill" id="dashEmailPill"><strong id="dashEmailBadge">—</strong></div>
-          <div class="pill" id="dashAgePill"><strong id="dashAge">—</strong> yrs old</div>
-        </div>
+        <div class="hero-name" id="dashName">—</div>
+        <div class="hero-id" id="dashSubtitle">Student ID — &nbsp;·&nbsp; —</div>
       </div>
     </div>
 
-    <!-- Stats Bar -->
-    <div class="stats-bar">
-      <div class="stat-box"><div class="stat-num">BSIS</div><div class="stat-lbl">Program</div></div>
-      <div class="stat-box"><div class="stat-num">2B</div><div class="stat-lbl">Section</div></div>
-      <div class="stat-box"><div class="stat-num">2nd</div><div class="stat-lbl">Year Level</div></div>
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="glass-card stat-card">
+        <div class="stat-num">BSIS</div>
+        <div class="stat-lbl">Program</div>
+      </div>
+      <div class="glass-card stat-card">
+        <div class="stat-num">2B</div>
+        <div class="stat-lbl">Section</div>
+      </div>
+      <div class="glass-card stat-card">
+        <div class="stat-num" id="dashYearStat">2nd</div>
+        <div class="stat-lbl">Year Level</div>
+      </div>
     </div>
 
-    <!-- Info Grid -->
+    <!-- Info grid -->
     <div class="info-grid">
-      <div class="info-card">
-        <div class="info-card-label">Personal Details</div>
-        <div class="info-row">
-          <div class="info-item"><span class="key">Full Name</span><span class="val" id="di-name">—</span></div>
-          <div class="info-item"><span class="key">Birthday</span><span class="val" id="di-bday">—</span></div>
-          <div class="info-item"><span class="key">Age</span><span class="val" id="di-age">—</span></div>
-          <div class="info-item"><span class="key">Gender</span><span class="val" id="di-gender">—</span></div>
-        </div>
-      </div>
-      <div class="info-card">
-        <div class="info-card-label">Contact & School</div>
-        <div class="info-row">
-          <div class="info-item"><span class="key">Student ID</span><span class="val" id="di-id">—</span></div>
-          <div class="info-item"><span class="key">Email</span><span class="val" id="di-email">—</span></div>
-          <div class="info-item"><span class="key">Contact</span><span class="val" id="di-contact">—</span></div>
-          <div class="info-item"><span class="key">Address</span><span class="val" id="di-address">—</span></div>
-        </div>
-      </div>
-      <div class="info-card bio-card">
-        <div class="info-card-label">About Me</div>
-        <div class="bio-text" id="di-bio">No bio provided.</div>
-      </div>
-    </div>
 
+      <!-- Personal -->
+      <div class="glass-card info-panel">
+        <div class="panel-label">Personal Info <span class="panel-label-bar"></span></div>
+        <div class="detail-list">
+          <div class="detail-row"><span class="detail-key">Full Name</span><span class="detail-val" id="di-fullname">—</span></div>
+          <div class="detail-row"><span class="detail-key">Birthday</span><span class="detail-val" id="di-bday">—</span></div>
+          <div class="detail-row"><span class="detail-key">Age</span><span class="detail-val" id="di-age">—</span></div>
+          <div class="detail-row"><span class="detail-key">Gender</span><span class="detail-val" id="di-gender">—</span></div>
+          <div class="detail-row"><span class="detail-key">Civil Status</span><span class="detail-val" id="di-civil">—</span></div>
+        </div>
+      </div>
+
+      <!-- Contact & School -->
+      <div class="glass-card info-panel">
+        <div class="panel-label">Contact & School <span class="panel-label-bar"></span></div>
+        <div class="detail-list">
+          <div class="detail-row"><span class="detail-key">Student ID</span><span class="detail-val" id="di-id">—</span></div>
+          <div class="detail-row"><span class="detail-key">Year Level</span><span class="detail-val" id="di-year">—</span></div>
+          <div class="detail-row"><span class="detail-key">Email</span><span class="detail-val" id="di-email">—</span></div>
+          <div class="detail-row"><span class="detail-key">Contact</span><span class="detail-val" id="di-contact">—</span></div>
+          <div class="detail-row"><span class="detail-key">Address</span><span class="detail-val" id="di-address">—</span></div>
+        </div>
+      </div>
+
+      <!-- Bio -->
+      <div class="glass-card info-panel info-panel-full">
+        <div class="panel-label">About Me <span class="panel-label-bar"></span></div>
+        <div class="bio-text">
+          <span class="bio-quote">"</span>
+          <span id="di-bio">No bio provided.</span>
+        </div>
+      </div>
+
+    </div>
   </div>
+  </div>
+
 </div>
 
 <script>
-  /* ── Storage ── */
-  let users = JSON.parse(localStorage.getItem('bsis2b_users') || '[]');
+  /* ═══════════════════════════════════
+     DATA LAYER  –  pure JS / memory
+     (falls back to sessionStorage so
+      page refresh keeps the session)
+  ═══════════════════════════════════ */
+  let users = [];
+  let photoDataURL = '';
   let currentUser = null;
 
-  /* ── Photo ── */
-  let photoDataURL = '';
+  // Persist users across page reloads using sessionStorage
+  // (data disappears when the browser tab is closed – no long-term storage)
+  function saveUsers() {
+    try { sessionStorage.setItem('_bsis_users', JSON.stringify(users)); } catch(e){}
+  }
+  function loadUsers() {
+    try {
+      const d = sessionStorage.getItem('_bsis_users');
+      if (d) users = JSON.parse(d);
+    } catch(e){}
+  }
+  loadUsers();
+
+  /* ── Toast helper ── */
+  let _toastTimer;
+  function showToast(msg) {
+    clearTimeout(_toastTimer);
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    _toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  /* ── Photo preview ── */
   function previewPhoto(input) {
     const file = input.files[0];
     if (!file) return;
-    const r = new FileReader();
-    r.onload = e => {
+    const reader = new FileReader();
+    reader.onload = e => {
       photoDataURL = e.target.result;
-      document.getElementById('photoPreview').src = photoDataURL;
-      document.getElementById('photoPreview').style.display = 'block';
-      document.getElementById('photoIcon').style.display = 'none';
+      const prev = document.getElementById('photoPreview');
+      const icon = document.getElementById('photoIcon');
+      prev.src = photoDataURL;
+      prev.style.display = 'block';
+      icon.style.display = 'none';
     };
-    r.readAsDataURL(file);
+    reader.readAsDataURL(file);
   }
 
-  /* ── Page switches ── */
+  /* ── Page navigation ── */
   function showPage(id) {
-    ['registerPage','loginPage','dashPage'].forEach(p => {
-      document.getElementById(p).classList.add('hidden');
-    });
+    ['registerPage','loginPage','dashPage'].forEach(p =>
+      document.getElementById(p).classList.add('hidden')
+    );
     document.getElementById(id).classList.remove('hidden');
+    // Scroll to top on every page switch
+    try { document.getElementById(id).scrollTo(0,0); } catch(e){}
     window.scrollTo(0,0);
   }
-  function showLogin() { showPage('loginPage'); }
+  function showLogin()    { showPage('loginPage'); }
   function showRegister() { showPage('registerPage'); }
 
-  /* ── Validate ── */
-  function v(id, errId, test) {
-    const el = document.getElementById(errId);
-    if (!test) { el.style.display = 'block'; return false; }
-    el.style.display = 'none'; return true;
+  /* ── Validation helper ── */
+  function validate(inputId, errId, condition) {
+    const errEl = document.getElementById(errId);
+    if (!condition) {
+      errEl.style.display = 'block';
+      document.getElementById(inputId).style.borderColor = 'var(--danger)';
+      return false;
+    }
+    errEl.style.display = 'none';
+    document.getElementById(inputId).style.borderColor = '';
+    return true;
   }
 
   /* ── Register ── */
   function register() {
-    const fn = document.getElementById('regFirstName').value.trim();
-    const ln = document.getElementById('regLastName').value.trim();
-    const em = document.getElementById('regEmail').value.trim();
-    const sid = document.getElementById('regStudentId').value.trim();
-    const pw = document.getElementById('regPassword').value;
-    const cf = document.getElementById('regConfirm').value;
+    const firstName  = document.getElementById('regFirstName').value.trim();
+    const lastName   = document.getElementById('regLastName').value.trim();
+    const email      = document.getElementById('regEmail').value.trim();
+    const studentId  = document.getElementById('regStudentId').value.trim();
+    const password   = document.getElementById('regPassword').value;
+    const confirm    = document.getElementById('regConfirm').value;
 
-    let ok = true;
-    ok = v('regFirstName','errFirstName', fn) && ok;
-    ok = v('regLastName', 'errLastName',  ln) && ok;
-    ok = v('regEmail',    'errEmail',     em && /\S+@\S+\.\S+/.test(em)) && ok;
-    ok = v('regStudentId','errStudentId', sid) && ok;
-    ok = v('regPassword', 'errPassword',  pw.length >= 6) && ok;
-    ok = v('regConfirm',  'errConfirm',   pw === cf) && ok;
-    if (!ok) return;
+    let allOk = true;
+    allOk = validate('regFirstName', 'errFirstName', firstName.length > 0)           && allOk;
+    allOk = validate('regLastName',  'errLastName',  lastName.length > 0)            && allOk;
+    allOk = validate('regEmail',     'errEmail',     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) && allOk;
+    allOk = validate('regStudentId', 'errStudentId', studentId.length > 0)           && allOk;
+    allOk = validate('regPassword',  'errPassword',  password.length >= 6)           && allOk;
+    allOk = validate('regConfirm',   'errConfirm',   password === confirm)           && allOk;
+    if (!allOk) return;
 
-    if (users.find(u => u.email === em)) {
-      alert('Email already registered. Please log in.'); showLogin(); return;
+    // Check duplicate email
+    if (users.some(u => u.email.toLowerCase() === email.toLowerCase())) {
+      showToast('Email already registered — please sign in.');
+      showLogin();
+      return;
     }
 
-    const user = {
-      firstName: fn, lastName: ln,
-      email: em, studentId: sid,
-      password: pw,
-      age: document.getElementById('regAge').value,
-      gender: document.getElementById('regGender').value,
-      birthday: document.getElementById('regBirthday').value,
-      contact: document.getElementById('regContact').value.trim(),
-      address: document.getElementById('regAddress').value.trim(),
-      bio: document.getElementById('regBio').value.trim(),
-      photo: photoDataURL,
+    const newUser = {
+      firstName,
+      lastName,
+      middleName : document.getElementById('regMiddleName').value.trim(),
+      suffix     : document.getElementById('regSuffix').value,
+      email,
+      studentId,
+      password,
+      yearLevel  : document.getElementById('regYear').value,
+      age        : document.getElementById('regAge').value,
+      gender     : document.getElementById('regGender').value,
+      birthday   : document.getElementById('regBirthday').value,
+      civilStatus: document.getElementById('regCivil').value,
+      contact    : document.getElementById('regContact').value.trim(),
+      address    : document.getElementById('regAddress').value.trim(),
+      bio        : document.getElementById('regBio').value.trim(),
+      photo      : photoDataURL,
     };
 
-    users.push(user);
-    localStorage.setItem('bsis2b_users', JSON.stringify(users));
-    alert('Registration successful! You can now log in.');
+    users.push(newUser);
+    saveUsers();
+    photoDataURL = '';   // reset for next registration
+
+    showToast('Account created! You can now sign in.');
     showLogin();
   }
 
   /* ── Login ── */
   function login() {
-    const em = document.getElementById('loginEmail').value.trim();
-    const pw = document.getElementById('loginPassword').value;
-    const errEl = document.getElementById('loginErr');
-    const user = users.find(u => u.email === em && u.password === pw);
-    if (!user) { errEl.textContent = 'Invalid email or password.'; errEl.style.color = 'var(--danger)'; return; }
-    errEl.textContent = '';
+    const email    = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const errTxt   = document.getElementById('loginErrTxt');
+    const errIcon  = document.getElementById('loginErrIcon');
+
+    const user = users.find(u =>
+      u.email.toLowerCase() === email.toLowerCase() && u.password === password
+    );
+
+    if (!user) {
+      errTxt.textContent   = 'Incorrect email or password. Please try again.';
+      errIcon.style.display = 'inline';
+      // Shake animation
+      const card = document.querySelector('#loginPage .login-card');
+      card.animate([
+        { transform: 'translateX(0)' },
+        { transform: 'translateX(-8px)' },
+        { transform: 'translateX(8px)' },
+        { transform: 'translateX(-6px)' },
+        { transform: 'translateX(6px)' },
+        { transform: 'translateX(0)' }
+      ], { duration: 350, easing: 'ease-out' });
+      return;
+    }
+
+    errTxt.textContent    = '';
+    errIcon.style.display = 'none';
     currentUser = user;
-    populateDash(user);
+    populateDashboard(user);
     showPage('dashPage');
+    showToast('Welcome back, ' + user.firstName + '!');
   }
 
   /* ── Populate Dashboard ── */
-  function populateDash(u) {
-    const fullName = u.firstName + ' ' + u.lastName;
-    document.getElementById('dashName').textContent = fullName;
-    document.getElementById('dashId').textContent = u.studentId || '—';
-    document.getElementById('dashEmailBadge').textContent = u.email;
-    document.getElementById('dashAge').textContent = u.age || '—';
+  function populateDashboard(u) {
+    // Build full name
+    const parts = [u.firstName];
+    if (u.middleName) parts.push(u.middleName);
+    parts.push(u.lastName);
+    if (u.suffix) parts.push(u.suffix);
+    const fullName = parts.join(' ');
+
+    // Hero
+    document.getElementById('dashName').textContent     = fullName;
+    document.getElementById('dashSubtitle').textContent = 'Student ID ' + (u.studentId || '—') + '  ·  ' + (u.email || '—');
+    document.getElementById('dashYearTag').textContent  = u.yearLevel || '2nd Year';
+    document.getElementById('dashYearStat').textContent = (u.yearLevel || '2nd').replace(' Year','');
 
     // Photo
-    const ph = document.getElementById('dashPhoto');
-    const pp = document.getElementById('dashPhotoPlaceholder');
+    const img = document.getElementById('dashAvatarImg');
+    const ph  = document.getElementById('dashAvatarPlaceholder');
     if (u.photo) {
-      ph.src = u.photo; ph.style.display = 'block'; pp.style.display = 'none';
+      img.src = u.photo;
+      img.style.display = 'block';
+      ph.style.display  = 'none';
     } else {
-      pp.textContent = (u.firstName[0] || '') + (u.lastName[0] || '');
-      ph.style.display = 'none'; pp.style.display = 'flex';
+      ph.textContent    = (u.firstName[0] || '') + (u.lastName[0] || '');
+      ph.style.display  = 'flex';
+      img.style.display = 'none';
     }
 
-    // Info items
-    document.getElementById('di-name').textContent = fullName;
-    document.getElementById('di-bday').textContent = u.birthday ? formatDate(u.birthday) : '—';
-    document.getElementById('di-age').textContent = u.age ? u.age + ' years old' : '—';
-    document.getElementById('di-gender').textContent = u.gender || '—';
-    document.getElementById('di-id').textContent = u.studentId || '—';
-    document.getElementById('di-email').textContent = u.email;
-    document.getElementById('di-contact').textContent = u.contact || '—';
-    document.getElementById('di-address').textContent = u.address || '—';
+    // Personal
+    document.getElementById('di-fullname').textContent = fullName;
+    document.getElementById('di-bday').textContent     = u.birthday   ? formatDate(u.birthday) : '—';
+    document.getElementById('di-age').textContent      = u.age        ? u.age + ' years old'    : '—';
+    document.getElementById('di-gender').textContent   = u.gender     || '—';
+    document.getElementById('di-civil').textContent    = u.civilStatus || '—';
+
+    // Contact & School
+    document.getElementById('di-id').textContent      = u.studentId || '—';
+    document.getElementById('di-year').textContent    = u.yearLevel  || '—';
+    document.getElementById('di-email').textContent   = u.email;
+    document.getElementById('di-contact').textContent = u.contact   || '—';
+    document.getElementById('di-address').textContent = u.address   || '—';
+
+    // Bio
     document.getElementById('di-bio').textContent = u.bio || 'No bio provided.';
   }
 
-  function formatDate(d) {
-    if (!d) return '—';
-    const [y,m,day] = d.split('-');
-    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    return ${months[+m-1]} ${+day}, ${y};
+  /* ── Date formatter ── */
+  function formatDate(dateStr) {
+    if (!dateStr) return '—';
+    const [y, m, d] = dateStr.split('-');
+    const months = ['January','February','March','April','May','June',
+                    'July','August','September','October','November','December'];
+    return months[+m - 1] + ' ' + +d + ', ' + y;
   }
 
   /* ── Logout ── */
   function logout() {
     currentUser = null;
-    document.getElementById('loginEmail').value = '';
+    document.getElementById('loginEmail').value    = '';
     document.getElementById('loginPassword').value = '';
+    document.getElementById('loginErrTxt').textContent = '';
+    document.getElementById('loginErrIcon').style.display = 'none';
     showLogin();
   }
 
-  /* ── Clock ── */
+  /* ── Live clock ── */
   function updateClock() {
     const now = new Date();
-    document.getElementById('clockEl').textContent = now.toLocaleTimeString('en-PH', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    document.getElementById('clockEl').textContent =
+      now.toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   }
   setInterval(updateClock, 1000);
   updateClock();
+
+  /* ── Clear red border on input ── */
+  document.querySelectorAll('input, select, textarea').forEach(el => {
+    el.addEventListener('input', () => { el.style.borderColor = ''; });
+  });
 </script>
 </body>
 </html>
