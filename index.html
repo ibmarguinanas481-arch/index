@@ -4,503 +4,539 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>BSIS-2B Student Portal</title>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Familjen+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #060912;
-      --surface: #0d1220;
-      --card: #111827;
-      --card2: #151e2e;
-      --border: #1e2d47;
-      --border2: #253450;
-      --accent: #2563eb;
-      --accent-light: #3b82f6;
-      --cyan: #0ea5e9;
-      --gold: #f59e0b;
-      --text: #f0f4ff;
-      --text2: #c8d3ea;
-      --muted: #6b7fa3;
-      --danger: #ef4444;
-      --success: #22c55e;
-      --radius: 16px;
-      --radius-sm: 10px;
+      --blue-900: #0f2d6b;
+      --blue-800: #1a3f8f;
+      --blue-700: #1d4ed8;
+      --blue-600: #2563eb;
+      --blue-500: #3b82f6;
+      --blue-400: #60a5fa;
+      --blue-300: #93c5fd;
+      --blue-200: #bfdbfe;
+      --blue-100: #dbeafe;
+      --blue-50:  #eff6ff;
+      --white:    #ffffff;
+      --gray-50:  #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-900: #111827;
+      --red:      #dc2626;
+      --green:    #16a34a;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.04);
+      --shadow:    0 4px 16px rgba(0,0,0,.07), 0 2px 6px rgba(0,0,0,.04);
+      --shadow-md: 0 8px 32px rgba(0,0,0,.09), 0 4px 12px rgba(0,0,0,.05);
+      --radius: 14px;
+      --radius-sm: 9px;
     }
 
     html { scroll-behavior: smooth; }
 
     body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      background: #e8eef8;
+      color: var(--gray-900);
       min-height: 100vh;
       overflow-x: hidden;
     }
 
-    /* ── Ambient background ── */
-    .ambient {
+    body::before {
+      content: '';
       position: fixed; inset: 0; z-index: 0; pointer-events: none;
-      overflow: hidden;
+      background:
+        radial-gradient(ellipse 70% 50% at 10% 0%, rgba(37,99,235,.12) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 60% at 90% 100%, rgba(29,78,216,.08) 0%, transparent 55%);
     }
-    .ambient-blob {
-      position: absolute; border-radius: 50%;
-      filter: blur(80px); opacity: .18;
-    }
-    .blob1 { width: 600px; height: 600px; background: var(--accent); top: -200px; left: -150px; animation: drift1 14s ease-in-out infinite alternate; }
-    .blob2 { width: 500px; height: 500px; background: var(--cyan); bottom: -150px; right: -100px; animation: drift2 16s ease-in-out infinite alternate; }
-    .blob3 { width: 300px; height: 300px; background: var(--gold); top: 40%; left: 45%; animation: drift1 18s ease-in-out 4s infinite alternate; opacity: .08; }
 
-    @keyframes drift1 { from { transform: translate(0,0) scale(1); } to { transform: translate(40px,30px) scale(1.1); } }
-    @keyframes drift2 { from { transform: translate(0,0) scale(1); } to { transform: translate(-30px,-40px) scale(1.08); } }
-
-    /* ── Page system ── */
+    /* ─── Page system ─── */
     .page {
       position: fixed; inset: 0; z-index: 2;
       display: flex; align-items: center; justify-content: center;
-      transition: opacity .45s cubic-bezier(.4,0,.2,1), transform .45s cubic-bezier(.4,0,.2,1);
-      overflow-y: auto;
-      padding: 1.5rem 1rem;
+      overflow-y: auto; padding: 2rem 1rem;
+      transition: opacity .4s cubic-bezier(.4,0,.2,1), transform .4s cubic-bezier(.4,0,.2,1);
     }
-    .page.hidden { opacity: 0; pointer-events: none; transform: translateY(16px) scale(.98); }
-    #dashPage { align-items: flex-start; justify-content: flex-start; flex-direction: column; padding: 0; }
+    .page.hidden { opacity: 0; pointer-events: none; transform: translateY(14px); }
+    #dashPage {
+      align-items: flex-start; justify-content: flex-start;
+      flex-direction: column; padding: 0;
+      background: var(--gray-50);
+    }
 
-    /* ── Shared card ── */
-    .glass-card {
-      background: linear-gradient(145deg, rgba(255,255,255,.05) 0%, rgba(255,255,255,.02) 100%);
-      border: 1px solid var(--border2);
+    /* ─── Shared card ─── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
       border-radius: var(--radius);
-      box-shadow: 0 24px 64px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.06);
+      box-shadow: var(--shadow);
     }
 
-    /* ═══════════════════════════
-        REGISTER
-    ═══════════════════════════ */
-    .reg-wrap {
-      width: 100%; max-width: 540px;
-      display: flex; flex-direction: column; align-items: center; gap: 1.2rem;
-    }
-
-    .portal-pill {
-      display: inline-flex; align-items: center; gap: .5rem;
-      background: rgba(37,99,235,.12);
-      border: 1px solid rgba(37,99,235,.3);
-      border-radius: 50px; padding: .38rem 1rem;
-      font-size: .75rem; font-weight: 600; letter-spacing: .07em;
-      text-transform: uppercase; color: #93c5fd;
-    }
-    .portal-pill-dot {
-      width: 7px; height: 7px; border-radius: 50%;
-      background: var(--accent-light);
-      box-shadow: 0 0 6px var(--accent-light);
-      animation: pulse-dot 2s ease-in-out infinite;
-    }
-    @keyframes pulse-dot {
-      0%,100% { opacity:1; transform:scale(1); }
-      50% { opacity:.5; transform:scale(.75); }
-    }
-
-    .reg-card {
-      width: 100%;
-      padding: 2.2rem 2rem;
-      animation: fadeUp .6s cubic-bezier(.16,1,.3,1) both;
-    }
-
-    @keyframes fadeUp { from { opacity:0; transform:translateY(28px); } to { opacity:1; transform:translateY(0); } }
-
-    .reg-heading { font-family: 'Familjen Grotesk', sans-serif; font-size: 1.75rem; font-weight: 700; letter-spacing: -.02em; margin-bottom: .3rem; }
-    .reg-sub { color: var(--muted); font-size: .88rem; margin-bottom: 1.8rem; line-height: 1.5; }
-
-    /* Photo uploader */
-    .photo-uploader {
-      display: flex; flex-direction: column; align-items: center; gap: .55rem;
-      margin-bottom: 1.6rem;
-    }
-    .photo-ring {
-      width: 92px; height: 92px; border-radius: 50%;
-      border: 2px dashed var(--border2);
-      background: var(--surface);
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; overflow: hidden; position: relative;
-      transition: border-color .25s, box-shadow .25s;
-    }
-    .photo-ring:hover { border-color: var(--accent-light); box-shadow: 0 0 0 4px rgba(59,130,246,.12); }
-    .photo-ring img { width: 100%; height: 100%; object-fit: cover; display: none; border-radius: 50%; }
-    .photo-ring-icon { color: var(--muted); transition: color .2s; }
-    .photo-ring:hover .photo-ring-icon { color: var(--accent-light); }
-    #photoInput { display: none; }
-    .photo-hint { font-size: .75rem; color: var(--muted); }
-
-    /* Form */
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .85rem; }
-    .form-full { grid-column: 1 / -1; }
-
+    /* ─── Inputs ─── */
     .field { display: flex; flex-direction: column; gap: .3rem; }
-    .field label { font-size: .72rem; font-weight: 600; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
-
-    .field input, .field select, .field textarea {
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: .68rem .9rem;
-      color: var(--text);
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: .9rem;
-      outline: none;
-      transition: border-color .2s, box-shadow .2s;
-      width: 100%;
-      appearance: none; -webkit-appearance: none;
+    .field label {
+      font-size: .7rem; font-weight: 700;
+      color: var(--gray-500); letter-spacing: .07em; text-transform: uppercase;
     }
-    .field input::placeholder, .field textarea::placeholder { color: var(--muted); opacity: .7; }
+    .field input, .field select, .field textarea {
+      background: var(--gray-50);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      padding: .7rem .95rem;
+      color: var(--gray-900); font-family: 'Inter', sans-serif;
+      font-size: .9rem; outline: none; width: 100%;
+      -webkit-appearance: none; appearance: none;
+      transition: border-color .2s, box-shadow .2s, background .2s;
+    }
+    .field input::placeholder, .field textarea::placeholder { color: var(--gray-300); }
     .field input:focus, .field select:focus, .field textarea:focus {
-      border-color: var(--accent-light);
+      background: var(--white);
+      border-color: var(--blue-500);
       box-shadow: 0 0 0 3px rgba(59,130,246,.14);
     }
     .field select { cursor: pointer; }
-    .field select option { background: #111827; color: var(--text); }
-    .field textarea { resize: none; height: 72px; line-height: 1.55; }
+    .field textarea { resize: none; height: 78px; line-height: 1.6; }
+    input[type="date"]::-webkit-calendar-picker-indicator { opacity: .45; cursor: pointer; }
 
-    input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(.5); cursor: pointer; }
-
-    .field-err { color: var(--danger); font-size: .76rem; margin-top: .15rem; display: none; }
-
-    /* Divider */
-    .form-divider {
-      grid-column: 1/-1;
-      height: 1px; background: var(--border);
-      margin: .3rem 0;
+    .field-err {
+      color: var(--red); font-size: .74rem; font-weight: 500;
+      display: none; align-items: center; gap: .3rem; margin-top: .1rem;
     }
+    .field-err.show { display: flex; }
 
-    /* Buttons */
+    /* ─── Primary button ─── */
     .btn-primary {
-      width: 100%; padding: .82rem;
-      background: linear-gradient(135deg, var(--accent) 0%, var(--cyan) 100%);
-      border: none; border-radius: var(--radius-sm);
-      color: #fff;
-      font-family: 'Familjen Grotesk', sans-serif;
-      font-size: 1rem; font-weight: 600; letter-spacing: .01em;
-      cursor: pointer; margin-top: 1.3rem;
-      position: relative; overflow: hidden;
+      width: 100%; padding: .84rem 1.5rem;
+      background: linear-gradient(160deg, var(--blue-600) 0%, var(--blue-800) 100%);
+      border: none; border-radius: var(--radius-sm); color: var(--white);
+      font-family: 'Inter', sans-serif; font-size: .95rem; font-weight: 600;
+      cursor: pointer; letter-spacing: .01em;
+      display: flex; align-items: center; justify-content: center; gap: .5rem;
       transition: opacity .2s, transform .15s, box-shadow .2s;
-      box-shadow: 0 4px 20px rgba(37,99,235,.4);
+      box-shadow: 0 4px 14px rgba(37,99,235,.35);
     }
-    .btn-primary::after {
-      content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(rgba(255,255,255,.08), transparent);
-    }
-    .btn-primary:hover { opacity: .92; transform: translateY(-1px); box-shadow: 0 8px 30px rgba(37,99,235,.5); }
+    .btn-primary:hover { opacity: .92; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(37,99,235,.42); }
     .btn-primary:active { transform: scale(.98); }
 
-    .switch-txt { text-align: center; font-size: .84rem; color: var(--muted); margin-top: .65rem; }
-    .switch-lnk { color: var(--cyan); text-decoration: none; font-weight: 600; cursor: pointer; }
+    .switch-txt { text-align: center; font-size: .84rem; color: var(--gray-500); margin-top: .65rem; }
+    .switch-lnk { color: var(--blue-600); font-weight: 600; cursor: pointer; }
     .switch-lnk:hover { text-decoration: underline; }
 
-    /* ═══════════════════════════
-        LOGIN
-    ═══════════════════════════ */
-    .login-card {
-      width: 100%; max-width: 420px;
-      padding: 2.8rem 2.2rem;
-      animation: fadeUp .6s cubic-bezier(.16,1,.3,1) both;
+    .divider { height: 1px; background: var(--gray-100); grid-column: 1/-1; margin: .35rem 0; }
+    .section-label {
+      grid-column: 1/-1; font-size: .7rem; font-weight: 700;
+      letter-spacing: .09em; text-transform: uppercase; color: var(--blue-600);
+      display: flex; align-items: center; gap: .55rem;
+    }
+    .section-label::after { content:''; flex:1; height:1px; background: var(--blue-100); }
+
+    /* ═════════════════════════════
+       REGISTER PAGE
+    ═════════════════════════════ */
+    #registerPage { background: transparent; }
+
+    .reg-outer {
+      width: 100%; max-width: 560px;
+      display: flex; flex-direction: column; align-items: center; gap: 1.1rem;
     }
 
-    .login-icon {
-      width: 54px; height: 54px; border-radius: 14px;
-      background: linear-gradient(135deg, var(--accent), var(--cyan));
+    .portal-badge {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: var(--white); border: 1px solid var(--blue-200);
+      border-radius: 50px; padding: .38rem 1rem;
+      font-size: .7rem; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--blue-700);
+      box-shadow: var(--shadow-sm);
+    }
+    .badge-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--blue-500); flex-shrink: 0;
+      animation: blink 2s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+
+    .reg-card {
+      width: 100%; padding: 2.2rem;
+      animation: fadeUp .55s cubic-bezier(.16,1,.3,1) both;
+    }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)} }
+
+    .reg-heading {
+      font-family: 'Manrope', sans-serif;
+      font-size: 1.6rem; font-weight: 800;
+      color: var(--gray-900); letter-spacing: -.02em; margin-bottom: .3rem;
+    }
+    .reg-sub { color: var(--gray-500); font-size: .875rem; line-height: 1.55; margin-bottom: 1.8rem; }
+
+    /* Photo upload */
+    .photo-upload-area {
+      display: flex; align-items: center; gap: 1.2rem;
+      padding: 1rem 1.2rem;
+      background: var(--blue-50); border: 1.5px dashed var(--blue-300);
+      border-radius: var(--radius-sm); margin-bottom: 1.5rem;
+      cursor: pointer; transition: border-color .2s, background .2s;
+    }
+    .photo-upload-area:hover { border-color: var(--blue-500); background: #e8f1ff; }
+    #photoInput { display: none; }
+
+    .photo-thumb {
+      width: 70px; height: 70px; border-radius: 50%;
+      overflow: hidden; flex-shrink: 0;
+      background: var(--blue-100); border: 2px solid var(--blue-300);
       display: flex; align-items: center; justify-content: center;
-      margin-bottom: 1.4rem;
-      box-shadow: 0 8px 28px rgba(37,99,235,.45);
+      transition: border-color .2s;
     }
+    .photo-upload-area:hover .photo-thumb { border-color: var(--blue-500); }
+    #photoPreview { width: 100%; height: 100%; object-fit: cover; display: none; }
+    #photoIcon { color: var(--blue-400); }
 
-    .login-title { font-family: 'Familjen Grotesk', sans-serif; font-size: 1.65rem; font-weight: 700; letter-spacing: -.02em; margin-bottom: .3rem; }
-    .login-sub { color: var(--muted); font-size: .88rem; margin-bottom: 2rem; }
+    .photo-upload-text { flex: 1; }
+    .photo-upload-title { font-size: .88rem; font-weight: 600; color: var(--gray-700); margin-bottom: .22rem; }
+    .photo-upload-hint { font-size: .75rem; color: var(--gray-400); line-height: 1.4; }
 
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .82rem; }
+    .form-full { grid-column: 1/-1; }
+
+    /* ═════════════════════════════
+       LOGIN PAGE
+    ═════════════════════════════ */
+    #loginPage { background: transparent; }
+
+    .login-card {
+      width: 100%; max-width: 420px; padding: 2.8rem 2.3rem;
+      animation: fadeUp .55s cubic-bezier(.16,1,.3,1) both;
+    }
+    .login-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      background: linear-gradient(145deg, var(--blue-600), var(--blue-800));
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 8px 24px rgba(37,99,235,.35);
+    }
+    .login-title {
+      font-family: 'Manrope', sans-serif;
+      font-size: 1.6rem; font-weight: 800;
+      color: var(--gray-900); letter-spacing: -.025em; margin-bottom: .3rem;
+    }
+    .login-sub { color: var(--gray-500); font-size: .875rem; margin-bottom: 1.8rem; }
     .login-fields { display: flex; flex-direction: column; gap: .9rem; }
-
     .login-err {
-      color: var(--danger); font-size: .82rem;
-      min-height: 1.1rem; margin-top: .4rem;
-      display: flex; align-items: center; gap: .4rem;
+      min-height: 1.2rem; margin-top: .4rem;
+      font-size: .82rem; font-weight: 500; color: var(--red);
+      display: flex; align-items: center; gap: .35rem;
     }
-    .login-err svg { flex-shrink: 0; }
 
-    /* ═══════════════════════════
-        DASHBOARD
-    ═══════════════════════════ */
+    /* ═════════════════════════════
+       DASHBOARD
+    ═════════════════════════════ */
     .topbar {
       width: 100%;
       display: flex; align-items: center; justify-content: space-between;
-      padding: .85rem 1.5rem;
-      background: rgba(6,9,18,.85);
-      backdrop-filter: blur(16px) saturate(180%);
-      border-bottom: 1px solid var(--border);
-      position: sticky; top: 0; z-index: 20;
-      flex-shrink: 0;
+      padding: .9rem 1.6rem;
+      background: var(--blue-900);
+      box-shadow: 0 2px 16px rgba(15,45,107,.3);
+      position: sticky; top: 0; z-index: 20; flex-shrink: 0;
     }
-    .topbar-left { display: flex; align-items: center; gap: .7rem; }
+    .topbar-left { display: flex; align-items: center; gap: .75rem; }
     .topbar-logo {
-      width: 32px; height: 32px; border-radius: 8px;
-      background: linear-gradient(135deg, var(--accent), var(--cyan));
+      width: 34px; height: 34px; border-radius: 9px;
+      background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.2);
       display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
     }
-    .topbar-brand { font-family: 'Familjen Grotesk', sans-serif; font-size: 1.05rem; font-weight: 700; }
+    .topbar-name {
+      font-family: 'Manrope', sans-serif;
+      font-size: 1rem; font-weight: 800; color: var(--white);
+    }
+    .topbar-sub { font-size: .7rem; color: var(--blue-300); margin-top: .04rem; }
     .topbar-right { display: flex; align-items: center; gap: .75rem; }
-    .topbar-clock { font-size: .78rem; color: var(--muted); font-variant-numeric: tabular-nums; display: none; }
-    @media (min-width: 480px) { .topbar-clock { display: block; } }
+    .topbar-clock { font-size: .78rem; color: var(--blue-300); font-variant-numeric: tabular-nums; }
+    @media(max-width:480px){ .topbar-clock, .topbar-sub { display:none; } }
 
     .btn-logout {
       display: flex; align-items: center; gap: .4rem;
-      background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.25);
-      color: #f87171; border-radius: 8px;
-      padding: .4rem .85rem; font-size: .8rem; font-weight: 600;
-      cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif;
-      transition: background .2s, border-color .2s;
+      background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+      color: var(--white); border-radius: 8px; padding: .42rem .9rem;
+      font-size: .8rem; font-weight: 600; cursor: pointer;
+      font-family: 'Inter', sans-serif; transition: background .2s;
     }
-    .btn-logout:hover { background: rgba(239,68,68,.2); border-color: rgba(239,68,68,.4); }
+    .btn-logout:hover { background: rgba(255,255,255,.18); }
 
     .dash-scroll { width: 100%; overflow-y: auto; flex: 1; }
-    .dash-body { width: 100%; max-width: 860px; margin: 0 auto; padding: 1.5rem 1.2rem 3rem; display: flex; flex-direction: column; gap: 1.2rem; }
-
-    /* Hero card */
-    .hero-card {
-      padding: 0;
-      overflow: hidden; position: relative;
+    .dash-body {
+      width: 100%; max-width: 900px; margin: 0 auto;
+      padding: 1.8rem 1.4rem 3rem;
+      display: flex; flex-direction: column; gap: 1.1rem;
     }
+
+    /* Hero */
+    .hero-card { overflow: hidden; padding: 0; }
     .hero-banner {
-      height: 90px;
-      background: linear-gradient(135deg, #1e3a8a 0%, #0c4a6e 40%, #134e4a 100%);
-      position: relative; overflow: hidden;
+      height: 96px; position: relative; overflow: hidden;
+      background: linear-gradient(135deg, var(--blue-900) 0%, var(--blue-700) 55%, #1e40af 100%);
     }
     .hero-banner::before {
-      content: '';
-      position: absolute; inset: 0;
+      content: ''; position: absolute; inset: 0;
       background: repeating-linear-gradient(
-        45deg,
-        transparent, transparent 20px,
-        rgba(255,255,255,.025) 20px, rgba(255,255,255,.025) 21px
+        -45deg, transparent 0, transparent 18px,
+        rgba(255,255,255,.04) 18px, rgba(255,255,255,.04) 19px
       );
     }
-    .hero-banner-dots {
-      position: absolute; right: 1.5rem; top: 50%; transform: translateY(-50%);
-      display: flex; gap: .4rem;
+    .hero-banner-glow {
+      position: absolute; width: 280px; height: 280px; border-radius: 50%;
+      background: rgba(96,165,250,.18); top: -120px; right: -70px; filter: blur(40px);
     }
-    .hero-banner-dots span {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: rgba(255,255,255,.2);
-    }
-    .hero-body { padding: 0 1.6rem 1.6rem; }
-    .hero-photo-row { display: flex; align-items: flex-end; justify-content: space-between; margin-top: -42px; margin-bottom: .9rem; }
-    .hero-photo-wrap { position: relative; }
 
-    .hero-photo-img {
-      width: 84px; height: 84px; border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid var(--card);
-      box-shadow: 0 0 0 3px var(--accent), 0 4px 20px rgba(0,0,0,.5);
-      display: none;
+    .hero-body { padding: 0 1.8rem 1.8rem; }
+    .hero-row {
+      display: flex; align-items: flex-end;
+      justify-content: space-between; gap: 1rem;
+      margin-top: -44px; margin-bottom: 1rem;
     }
-    .hero-photo-placeholder {
-      width: 84px; height: 84px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--cyan));
-      border: 3px solid var(--card);
-      box-shadow: 0 0 0 3px var(--accent), 0 4px 20px rgba(0,0,0,.5);
+
+    /* Profile photo ring – clickable */
+    .prof-ring {
+      width: 88px; height: 88px; border-radius: 50%;
+      border: 4px solid var(--white);
+      box-shadow: 0 4px 14px rgba(0,0,0,.15);
+      overflow: hidden; cursor: pointer; position: relative;
+      background: var(--blue-100);
       display: flex; align-items: center; justify-content: center;
-      font-family: 'Familjen Grotesk', sans-serif;
-      font-size: 1.8rem; font-weight: 700; color: #fff;
+      flex-shrink: 0;
     }
-    .online-badge {
-      position: absolute; bottom: 4px; right: 4px;
-      width: 17px; height: 17px; border-radius: 50%;
-      background: var(--success); border: 2.5px solid var(--card);
-      box-shadow: 0 0 8px var(--success);
+    #dashPhotoImg { width: 100%; height: 100%; object-fit: cover; display: none; }
+    .prof-initials {
+      font-family: 'Manrope', sans-serif;
+      font-size: 1.8rem; font-weight: 800; color: var(--blue-600); user-select: none;
     }
+    .prof-overlay {
+      position: absolute; inset: 0; border-radius: 50%;
+      background: rgba(37,99,235,.65);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity .2s;
+    }
+    .prof-ring:hover .prof-overlay { opacity: 1; }
+    .online-dot {
+      position: absolute; bottom: 3px; right: 3px;
+      width: 15px; height: 15px; border-radius: 50%;
+      background: var(--green); border: 3px solid var(--white);
+    }
+    #dashPhotoInput { display: none; }
+    .change-photo-hint {
+      font-size: .7rem; color: var(--blue-500); font-weight: 600;
+      margin-top: .35rem; cursor: pointer; display: flex; align-items: center; gap: .3rem;
+    }
+    .change-photo-hint:hover { color: var(--blue-700); }
 
-    .hero-tags { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: .2rem; }
-    .tag {
+    .hero-tags { display: flex; flex-wrap: wrap; gap: .4rem; }
+    .htag {
       display: inline-flex; align-items: center; gap: .3rem;
-      padding: .26rem .65rem; border-radius: 50px; font-size: .72rem; font-weight: 600;
+      padding: .27rem .7rem; border-radius: 50px;
+      font-size: .68rem; font-weight: 700; letter-spacing: .04em;
     }
-    .tag-blue { background: rgba(37,99,235,.15); border: 1px solid rgba(37,99,235,.3); color: #93c5fd; }
-    .tag-cyan { background: rgba(14,165,233,.15); border: 1px solid rgba(14,165,233,.3); color: #7dd3fc; }
-    .tag-green { background: rgba(34,197,94,.12); border: 1px solid rgba(34,197,94,.25); color: #86efac; }
+    .ht-blue { background: var(--blue-100); color: var(--blue-700); }
+    .ht-navy { background: var(--blue-900); color: var(--blue-300); }
+    .ht-green { background: #f0fdf4; color: var(--green); }
 
-    .hero-name { font-family: 'Familjen Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700; letter-spacing: -.02em; margin-bottom: .25rem; }
-    .hero-id { font-size: .82rem; color: var(--muted); }
+    .hero-name {
+      font-family: 'Manrope', sans-serif;
+      font-size: 1.5rem; font-weight: 800;
+      color: var(--gray-900); letter-spacing: -.02em; margin-bottom: .3rem;
+    }
+    .hero-meta { display: flex; flex-wrap: wrap; gap: .2rem .9rem; }
+    .hm-item { display: flex; align-items: center; gap: .3rem; font-size: .81rem; color: var(--gray-500); }
+    .hm-item svg { color: var(--blue-400); }
 
-    /* Stats row */
-    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; }
+    /* Stats */
+    .stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; }
     .stat-card {
-      padding: 1rem 1rem 1.1rem;
-      text-align: center; cursor: default;
-      transition: border-color .25s, transform .2s;
+      padding: 1.15rem 1rem 1.25rem; text-align: center;
+      transition: transform .2s, box-shadow .2s;
     }
-    .stat-card:hover { border-color: var(--border2); transform: translateY(-2px); }
-    .stat-num {
-      font-family: 'Familjen Grotesk', sans-serif;
-      font-size: 1.65rem; font-weight: 700; letter-spacing: -.02em;
-      background: linear-gradient(135deg, var(--accent-light), var(--cyan));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      line-height: 1.1; margin-bottom: .25rem;
+    .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .stat-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: var(--blue-50); margin: 0 auto .55rem;
+      display: flex; align-items: center; justify-content: center;
     }
-    .stat-lbl { font-size: .7rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; font-weight: 600; }
+    .stat-val {
+      font-family: 'Manrope', sans-serif; font-size: 1.45rem; font-weight: 800;
+      color: var(--blue-700); line-height: 1; margin-bottom: .22rem;
+    }
+    .stat-lbl { font-size: .67rem; color: var(--gray-400); text-transform: uppercase; letter-spacing: .07em; font-weight: 600; }
 
     /* Info grid */
-    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .info-panel { padding: 1.4rem 1.5rem; transition: box-shadow .2s; }
+    .info-panel:hover { box-shadow: var(--shadow-md); }
+    .panel-full { grid-column: 1/-1; }
 
-    .info-panel { padding: 1.3rem; transition: border-color .25s; }
-    .info-panel:hover { border-color: var(--border2); }
-    .info-panel-full { grid-column: 1/-1; }
-
-    .panel-label {
-      font-size: .68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
-      color: var(--muted); margin-bottom: 1rem;
-      display: flex; align-items: center; gap: .5rem;
+    .panel-hd { display: flex; align-items: center; gap: .55rem; margin-bottom: 1.1rem; }
+    .panel-icon {
+      width: 30px; height: 30px; border-radius: 8px;
+      background: var(--blue-50);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
-    .panel-label-bar {
-      flex: 1; height: 1.5px;
-      background: linear-gradient(90deg, var(--border2), transparent);
-    }
+    .panel-title { font-size: .76rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--gray-600); }
 
     .detail-list { display: flex; flex-direction: column; gap: .65rem; }
-    .detail-row { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; font-size: .84rem; }
-    .detail-key { color: var(--muted); flex-shrink: 0; font-size: .8rem; }
-    .detail-val { color: var(--text2); font-weight: 500; text-align: right; word-break: break-word; }
-
-    .bio-text { font-size: .87rem; color: var(--muted); line-height: 1.75; font-style: italic; }
-    .bio-quote {
-      font-size: 2.5rem; font-family: Georgia, serif;
-      line-height: .5; color: var(--border2); display: block; margin-bottom: .4rem;
+    .detail-row {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: .75rem; padding-bottom: .65rem;
+      border-bottom: 1px solid var(--gray-100);
     }
+    .detail-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .dk { font-size: .78rem; color: var(--gray-400); font-weight: 500; flex-shrink: 0; }
+    .dv { font-size: .83rem; color: var(--gray-700); font-weight: 600; text-align: right; word-break: break-word; }
 
-    /* ── Responsive ── */
-    @media (max-width: 560px) {
-      .hero-name { font-size: 1.2rem; }
-      .info-grid { grid-template-columns: 1fr; }
-      .info-panel-full { grid-column: 1; }
-      .form-grid { grid-template-columns: 1fr; }
-      .form-full { grid-column: 1; }
-      .reg-card { padding: 1.8rem 1.2rem; }
-      .login-card { padding: 2rem 1.3rem; }
-      .stats-row { grid-template-columns: repeat(3,1fr); gap: .5rem; }
-      .stat-num { font-size: 1.3rem; }
-      .dash-body { padding: 1rem .8rem 2.5rem; }
-    }
+    .bio-q { font-size: 2.6rem; line-height: .4; color: var(--blue-200); font-family: Georgia,serif; display: block; margin-bottom: .5rem; }
+    .bio-text { font-size: .875rem; color: var(--gray-600); line-height: 1.8; }
 
-    @media (max-width: 360px) {
-      .stats-row { grid-template-columns: 1fr 1fr; }
-      .stats-row .stat-card:last-child { grid-column: 1/-1; }
-    }
-
-    /* ── Scrollbar ── */
-    ::-webkit-scrollbar { width: 5px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
-
-    /* ── Toast notification ── */
+    /* Toast */
     .toast {
-      position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(80px);
-      background: var(--card2); border: 1px solid var(--border2);
+      position: fixed; bottom: 1.5rem; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--gray-900); color: var(--white);
       border-radius: 50px; padding: .65rem 1.4rem;
-      font-size: .84rem; font-weight: 500; color: var(--text2);
-      box-shadow: 0 12px 40px rgba(0,0,0,.5);
-      z-index: 100; transition: transform .35s cubic-bezier(.34,1.56,.64,1), opacity .3s;
-      opacity: 0; pointer-events: none;
-      display: flex; align-items: center; gap: .5rem;
-      white-space: nowrap;
+      font-size: .83rem; font-weight: 500;
+      box-shadow: 0 12px 36px rgba(0,0,0,.18);
+      z-index: 100; opacity: 0; pointer-events: none;
+      display: flex; align-items: center; gap: .5rem; white-space: nowrap;
+      transition: transform .35s cubic-bezier(.34,1.56,.64,1), opacity .3s;
     }
     .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-    .toast-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); flex-shrink: 0; }
+    .toast-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; flex-shrink: 0; }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .info-grid { grid-template-columns: 1fr; }
+      .panel-full { grid-column: 1; }
+      .hero-name { font-size: 1.2rem; }
+      .hero-body { padding: 0 1.1rem 1.4rem; }
+    }
+    @media (max-width: 440px) {
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .stats-row .stat-card:last-child { grid-column: 1/-1; }
+      .stat-icon { display: none; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-full, .section-label, .divider { grid-column: 1; }
+      .reg-card, .login-card { padding: 1.6rem 1.1rem; }
+    }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 4px; }
   </style>
 </head>
 <body>
 
-<!-- Ambient background -->
-<div class="ambient">
-  <div class="ambient-blob blob1"></div>
-  <div class="ambient-blob blob2"></div>
-  <div class="ambient-blob blob3"></div>
-</div>
-
-<!-- Toast -->
-<div class="toast" id="toast">
-  <span class="toast-dot"></span>
-  <span id="toastMsg">Success</span>
-</div>
+<!-- Toast notification -->
+<div class="toast" id="toast"><span class="toast-dot"></span><span id="toastMsg"></span></div>
 
 <!-- ═══════════════════════════════
      REGISTER PAGE
 ═══════════════════════════════ -->
 <div class="page" id="registerPage">
-  <div class="reg-wrap">
+  <div class="reg-outer">
 
-    <div class="portal-pill">
-      <span class="portal-pill-dot"></span>
-      BSIS-2B Student Portal
-    </div>
+    <div class="portal-badge"><span class="badge-dot"></span>BSIS-2B · Student Portal</div>
 
-    <div class="glass-card reg-card">
-      <div class="reg-heading">Create Account</div>
-      <div class="reg-sub">Register with your personal information to access your student portal.</div>
+    <div class="card reg-card">
+      <div class="reg-heading">Create your Account</div>
+      <div class="reg-sub">Fill in your personal information to register and access your student portal.</div>
 
-      <!-- Photo Upload -->
-      <div class="photo-uploader">
-        <div class="photo-ring" id="photoRing" onclick="document.getElementById('photoInput').click()" title="Upload your photo">
+      <!-- Photo upload -->
+      <div class="photo-upload-area" id="photoUploadArea" onclick="document.getElementById('photoInput').click()">
+        <div class="photo-thumb" id="photoThumb">
           <img id="photoPreview" alt="Preview"/>
-          <svg class="photo-ring-icon" id="photoIcon" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24">
-            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-            <circle cx="12" cy="13" r="4"/>
+          <svg id="photoIcon" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="18" height="18" rx="3"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <polyline points="21 15 16 10 5 21"/>
           </svg>
         </div>
-        <input type="file" id="photoInput" accept="image/*" onchange="previewPhoto(this)"/>
-        <div class="photo-hint">Tap to upload your profile photo</div>
+        <div class="photo-upload-text">
+          <div class="photo-upload-title">Upload Profile Photo</div>
+          <div class="photo-upload-hint">Tap here to choose an image. JPG, PNG, or GIF supported.</div>
+        </div>
+        <svg width="18" height="18" fill="none" stroke="var(--blue-400)" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
       </div>
+      <input type="file" id="photoInput" accept="image/*" onchange="previewPhoto(this)"/>
 
       <div class="form-grid">
 
-        <!-- Name -->
+        <div class="section-label">Personal Information</div>
+
         <div class="field">
           <label>First Name *</label>
           <input type="text" id="regFirstName" placeholder="Juan" autocomplete="given-name"/>
-          <div class="field-err" id="errFirstName">First name is required</div>
+          <div class="field-err" id="errFirstName">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            First name is required
+          </div>
         </div>
         <div class="field">
           <label>Last Name *</label>
           <input type="text" id="regLastName" placeholder="Dela Cruz" autocomplete="family-name"/>
-          <div class="field-err" id="errLastName">Last name is required</div>
+          <div class="field-err" id="errLastName">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Last name is required
+          </div>
         </div>
-
-        <!-- Middle name + suffix -->
         <div class="field">
           <label>Middle Name</label>
-          <input type="text" id="regMiddleName" placeholder="Santos" autocomplete="additional-name"/>
+          <input type="text" id="regMiddleName" placeholder="Santos"/>
         </div>
         <div class="field">
           <label>Suffix</label>
           <select id="regSuffix">
             <option value="">None</option>
-            <option>Jr.</option>
-            <option>Sr.</option>
-            <option>II</option>
-            <option>III</option>
+            <option>Jr.</option><option>Sr.</option><option>II</option><option>III</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Age</label>
+          <input type="number" id="regAge" placeholder="20" min="15" max="60"/>
+        </div>
+        <div class="field">
+          <label>Gender</label>
+          <select id="regGender">
+            <option value="">Select</option>
+            <option>Male</option><option>Female</option>
+            <option>Non-binary</option><option>Prefer not to say</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Birthday</label>
+          <input type="date" id="regBirthday"/>
+        </div>
+        <div class="field">
+          <label>Civil Status</label>
+          <select id="regCivil">
+            <option value="">Select</option>
+            <option>Single</option><option>Married</option><option>Widowed</option>
           </select>
         </div>
 
-        <!-- Email -->
-        <div class="field form-full">
-          <label>Email Address *</label>
-          <input type="email" id="regEmail" placeholder="juan.delacruz@email.com" autocomplete="email"/>
-          <div class="field-err" id="errEmail">Enter a valid email address</div>
-        </div>
+        <div class="divider"></div>
+        <div class="section-label">School Information</div>
 
-        <div class="form-divider"></div>
-
-        <!-- Student ID -->
         <div class="field">
           <label>Student ID *</label>
           <input type="text" id="regStudentId" placeholder="2024-BSIS-001"/>
-          <div class="field-err" id="errStudentId">Student ID is required</div>
+          <div class="field-err" id="errStudentId">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Student ID is required
+          </div>
         </div>
         <div class="field">
           <label>Year Level</label>
@@ -511,71 +547,62 @@
             <option value="4th Year">4th Year</option>
           </select>
         </div>
-
-        <!-- Personal -->
-        <div class="field">
-          <label>Age</label>
-          <input type="number" id="regAge" placeholder="20" min="15" max="60"/>
+        <div class="field form-full">
+          <label>Email Address *</label>
+          <input type="email" id="regEmail" placeholder="juan.delacruz@email.com" autocomplete="email"/>
+          <div class="field-err" id="errEmail">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Enter a valid email address
+          </div>
         </div>
-        <div class="field">
-          <label>Gender</label>
-          <select id="regGender">
-            <option value="">Select</option>
-            <option>Male</option>
-            <option>Female</option>
-            <option>Non-binary</option>
-            <option>Prefer not to say</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label>Birthday</label>
-          <input type="date" id="regBirthday"/>
-        </div>
-        <div class="field">
-          <label>Civil Status</label>
-          <select id="regCivil">
-            <option value="">Select</option>
-            <option>Single</option>
-            <option>Married</option>
-          </select>
-        </div>
-
         <div class="field form-full">
           <label>Contact Number</label>
           <input type="tel" id="regContact" placeholder="+63 912 345 6789" autocomplete="tel"/>
         </div>
         <div class="field form-full">
-          <label>Address</label>
-          <input type="text" id="regAddress" placeholder="Barangay, City, Province" autocomplete="street-address"/>
+          <label>Home Address</label>
+          <input type="text" id="regAddress" placeholder="Barangay, City, Province"/>
         </div>
 
-        <div class="form-divider"></div>
+        <div class="divider"></div>
+        <div class="section-label">Account Security</div>
 
-        <!-- Password -->
         <div class="field form-full">
           <label>Password *</label>
-          <input type="password" id="regPassword" placeholder="Create a strong password" autocomplete="new-password"/>
-          <div class="field-err" id="errPassword">Minimum 6 characters required</div>
+          <input type="password" id="regPassword" placeholder="Minimum 6 characters" autocomplete="new-password"/>
+          <div class="field-err" id="errPassword">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Password must be at least 6 characters
+          </div>
         </div>
         <div class="field form-full">
           <label>Confirm Password *</label>
-          <input type="password" id="regConfirm" placeholder="Repeat your password" autocomplete="new-password"/>
-          <div class="field-err" id="errConfirm">Passwords do not match</div>
+          <input type="password" id="regConfirm" placeholder="Re-enter your password" autocomplete="new-password"/>
+          <div class="field-err" id="errConfirm">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Passwords do not match
+          </div>
         </div>
 
-        <!-- Bio -->
+        <div class="divider"></div>
+        <div class="section-label">About</div>
+
         <div class="field form-full">
-          <label>About Me</label>
+          <label>Short Bio</label>
           <textarea id="regBio" placeholder="Write a short bio about yourself…"></textarea>
         </div>
 
       </div>
 
-      <button class="btn-primary" id="regBtn" onclick="register()">
-        Create Account &nbsp;→
+      <button class="btn-primary" onclick="register()" style="margin-top:1.4rem">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/>
+        </svg>
+        Create Account
       </button>
-      <div class="switch-txt">Already have an account? <a class="switch-lnk" onclick="showLogin()">Sign in</a></div>
+      <div class="switch-txt">Already have an account? <span class="switch-lnk" onclick="showLogin()">Sign in here</span></div>
     </div>
 
   </div>
@@ -585,7 +612,7 @@
      LOGIN PAGE
 ═══════════════════════════════ -->
 <div class="page hidden" id="loginPage">
-  <div class="glass-card login-card">
+  <div class="card login-card">
 
     <div class="login-icon">
       <svg width="26" height="26" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24">
@@ -594,7 +621,7 @@
       </svg>
     </div>
 
-    <div class="login-title">Welcome back 👋</div>
+    <div class="login-title">Welcome Back</div>
     <div class="login-sub">Sign in to your BSIS-2B student portal to continue.</div>
 
     <div class="login-fields">
@@ -611,15 +638,21 @@
     </div>
 
     <div class="login-err" id="loginErr">
-      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:none" id="loginErrIcon">
+      <svg id="loginErrIcon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:none;flex-shrink:0">
         <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
       </svg>
       <span id="loginErrTxt"></span>
     </div>
 
-    <button class="btn-primary" onclick="login()">Sign In &nbsp;→</button>
-    <div class="switch-txt" style="margin-top:.7rem">No account yet? <a class="switch-lnk" onclick="showRegister()">Register here</a></div>
-
+    <button class="btn-primary" onclick="login()">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+        <polyline points="10 17 15 12 10 7"/>
+        <line x1="15" y1="12" x2="3" y2="12"/>
+      </svg>
+      Sign In
+    </button>
+    <div class="switch-txt" style="margin-top:.7rem">New here? <span class="switch-lnk" onclick="showRegister()">Create an account</span></div>
   </div>
 </div>
 
@@ -631,12 +664,15 @@
   <div class="topbar">
     <div class="topbar-left">
       <div class="topbar-logo">
-        <svg width="17" height="17" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24">
+        <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24">
           <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
           <path d="M6 12v5c3 3 9 3 12 0v-5"/>
         </svg>
       </div>
-      <div class="topbar-brand">BSIS-2B Portal</div>
+      <div>
+        <div class="topbar-name">BSIS-2B Portal</div>
+        <div class="topbar-sub">Bachelor of Science in Information Systems</div>
+      </div>
     </div>
     <div class="topbar-right">
       <div class="topbar-clock" id="clockEl"></div>
@@ -654,43 +690,84 @@
   <div class="dash-scroll">
   <div class="dash-body">
 
-    <!-- Hero -->
-    <div class="glass-card hero-card">
+    <!-- Hero card -->
+    <div class="card hero-card">
       <div class="hero-banner">
-        <div class="hero-banner-dots">
-          <span></span><span></span><span></span>
-        </div>
+        <div class="hero-banner-glow"></div>
       </div>
       <div class="hero-body">
-        <div class="hero-photo-row">
-          <div class="hero-photo-wrap">
-            <div class="hero-photo-placeholder" id="dashAvatarPlaceholder"></div>
-            <img class="hero-photo-img" id="dashAvatarImg" alt="Profile photo"/>
-            <div class="online-badge"></div>
+        <div class="hero-row">
+          <div>
+            <div style="position:relative;display:inline-block">
+              <div class="prof-ring" id="profRing" onclick="document.getElementById('dashPhotoInput').click()" title="Click to change photo">
+                <img id="dashPhotoImg" alt="Profile"/>
+                <div class="prof-initials" id="dashInitials">?</div>
+                <div class="prof-overlay">
+                  <svg width="22" height="22" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                    <circle cx="12" cy="13" r="4"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="online-dot"></div>
+            </div>
+            <div class="change-photo-hint" onclick="document.getElementById('dashPhotoInput').click()">
+              <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              Change photo
+            </div>
           </div>
           <div class="hero-tags">
-            <span class="tag tag-blue">BSIS</span>
-            <span class="tag tag-cyan" id="dashYearTag">2nd Year</span>
-            <span class="tag tag-green">Section 2B</span>
+            <span class="htag ht-blue">BSIS</span>
+            <span class="htag ht-navy" id="dashYearTag">2nd Year</span>
+            <span class="htag ht-green">Section 2B</span>
           </div>
         </div>
         <div class="hero-name" id="dashName">—</div>
-        <div class="hero-id" id="dashSubtitle">Student ID — &nbsp;·&nbsp; —</div>
+        <div class="hero-meta">
+          <span class="hm-item">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3h2a2 2 0 0 1 2 2v2H4V5a2 2 0 0 1 2-2h2"/></svg>
+            <span id="dashIdMeta">ID —</span>
+          </span>
+          <span class="hm-item">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <span id="dashEmailMeta">—</span>
+          </span>
+        </div>
       </div>
     </div>
+    <input type="file" id="dashPhotoInput" accept="image/*" onchange="updateDashPhoto(this)"/>
 
     <!-- Stats -->
     <div class="stats-row">
-      <div class="glass-card stat-card">
-        <div class="stat-num">BSIS</div>
+      <div class="card stat-card">
+        <div class="stat-icon">
+          <svg width="17" height="17" fill="none" stroke="var(--blue-500)" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+          </svg>
+        </div>
+        <div class="stat-val">BSIS</div>
         <div class="stat-lbl">Program</div>
       </div>
-      <div class="glass-card stat-card">
-        <div class="stat-num">2B</div>
+      <div class="card stat-card">
+        <div class="stat-icon">
+          <svg width="17" height="17" fill="none" stroke="var(--blue-500)" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <div class="stat-val">2B</div>
         <div class="stat-lbl">Section</div>
       </div>
-      <div class="glass-card stat-card">
-        <div class="stat-num" id="dashYearStat">2nd</div>
+      <div class="card stat-card">
+        <div class="stat-icon">
+          <svg width="17" height="17" fill="none" stroke="var(--blue-500)" stroke-width="2" viewBox="0 0 24 24">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+        </div>
+        <div class="stat-val" id="dashYearStat">2nd</div>
         <div class="stat-lbl">Year Level</div>
       </div>
     </div>
@@ -698,37 +775,54 @@
     <!-- Info grid -->
     <div class="info-grid">
 
-      <!-- Personal -->
-      <div class="glass-card info-panel">
-        <div class="panel-label">Personal Info <span class="panel-label-bar"></span></div>
+      <div class="card info-panel">
+        <div class="panel-hd">
+          <div class="panel-icon">
+            <svg width="15" height="15" fill="none" stroke="var(--blue-600)" stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7"/>
+            </svg>
+          </div>
+          <div class="panel-title">Personal Information</div>
+        </div>
         <div class="detail-list">
-          <div class="detail-row"><span class="detail-key">Full Name</span><span class="detail-val" id="di-fullname">—</span></div>
-          <div class="detail-row"><span class="detail-key">Birthday</span><span class="detail-val" id="di-bday">—</span></div>
-          <div class="detail-row"><span class="detail-key">Age</span><span class="detail-val" id="di-age">—</span></div>
-          <div class="detail-row"><span class="detail-key">Gender</span><span class="detail-val" id="di-gender">—</span></div>
-          <div class="detail-row"><span class="detail-key">Civil Status</span><span class="detail-val" id="di-civil">—</span></div>
+          <div class="detail-row"><span class="dk">Full Name</span><span class="dv" id="di-fullname">—</span></div>
+          <div class="detail-row"><span class="dk">Birthday</span><span class="dv" id="di-bday">—</span></div>
+          <div class="detail-row"><span class="dk">Age</span><span class="dv" id="di-age">—</span></div>
+          <div class="detail-row"><span class="dk">Gender</span><span class="dv" id="di-gender">—</span></div>
+          <div class="detail-row"><span class="dk">Civil Status</span><span class="dv" id="di-civil">—</span></div>
         </div>
       </div>
 
-      <!-- Contact & School -->
-      <div class="glass-card info-panel">
-        <div class="panel-label">Contact & School <span class="panel-label-bar"></span></div>
+      <div class="card info-panel">
+        <div class="panel-hd">
+          <div class="panel-icon">
+            <svg width="15" height="15" fill="none" stroke="var(--blue-600)" stroke-width="2" viewBox="0 0 24 24">
+              <rect x="2" y="7" width="20" height="14" rx="2"/>
+              <path d="M16 3h2a2 2 0 0 1 2 2v2H4V5a2 2 0 0 1 2-2h2"/>
+            </svg>
+          </div>
+          <div class="panel-title">School &amp; Contact</div>
+        </div>
         <div class="detail-list">
-          <div class="detail-row"><span class="detail-key">Student ID</span><span class="detail-val" id="di-id">—</span></div>
-          <div class="detail-row"><span class="detail-key">Year Level</span><span class="detail-val" id="di-year">—</span></div>
-          <div class="detail-row"><span class="detail-key">Email</span><span class="detail-val" id="di-email">—</span></div>
-          <div class="detail-row"><span class="detail-key">Contact</span><span class="detail-val" id="di-contact">—</span></div>
-          <div class="detail-row"><span class="detail-key">Address</span><span class="detail-val" id="di-address">—</span></div>
+          <div class="detail-row"><span class="dk">Student ID</span><span class="dv" id="di-id">—</span></div>
+          <div class="detail-row"><span class="dk">Year Level</span><span class="dv" id="di-year">—</span></div>
+          <div class="detail-row"><span class="dk">Email</span><span class="dv" id="di-email" style="font-size:.76rem">—</span></div>
+          <div class="detail-row"><span class="dk">Contact</span><span class="dv" id="di-contact">—</span></div>
+          <div class="detail-row"><span class="dk">Address</span><span class="dv" id="di-address">—</span></div>
         </div>
       </div>
 
-      <!-- Bio -->
-      <div class="glass-card info-panel info-panel-full">
-        <div class="panel-label">About Me <span class="panel-label-bar"></span></div>
-        <div class="bio-text">
-          <span class="bio-quote">"</span>
-          <span id="di-bio">No bio provided.</span>
+      <div class="card info-panel panel-full">
+        <div class="panel-hd">
+          <div class="panel-icon">
+            <svg width="15" height="15" fill="none" stroke="var(--blue-600)" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+          </div>
+          <div class="panel-title">About Me</div>
         </div>
+        <span class="bio-q">"</span>
+        <p class="bio-text" id="di-bio">No bio provided.</p>
       </div>
 
     </div>
@@ -738,220 +832,210 @@
 </div>
 
 <script>
-  /* ═══════════════════════════════════
-     DATA LAYER  –  pure JS / memory
-     (falls back to sessionStorage so
-      page refresh keeps the session)
-  ═══════════════════════════════════ */
+  /* ── State ── */
   let users = [];
-  let photoDataURL = '';
   let currentUser = null;
+  let regPhotoDataURL = '';
 
-  // Persist users across page reloads using sessionStorage
-  // (data disappears when the browser tab is closed – no long-term storage)
+  (function() {
+    try { const d = sessionStorage.getItem('_bsis_users'); if (d) users = JSON.parse(d); } catch(e) {}
+  })();
   function saveUsers() {
-    try { sessionStorage.setItem('_bsis_users', JSON.stringify(users)); } catch(e){}
+    try { sessionStorage.setItem('_bsis_users', JSON.stringify(users)); } catch(e) {}
   }
-  function loadUsers() {
-    try {
-      const d = sessionStorage.getItem('_bsis_users');
-      if (d) users = JSON.parse(d);
-    } catch(e){}
-  }
-  loadUsers();
 
-  /* ── Toast helper ── */
-  let _toastTimer;
-  function showToast(msg) {
-    clearTimeout(_toastTimer);
-    const t = document.getElementById('toast');
+  /* ── Toast ── */
+  let _tt;
+  function toast(msg) {
+    clearTimeout(_tt);
     document.getElementById('toastMsg').textContent = msg;
-    t.classList.add('show');
-    _toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+    const el = document.getElementById('toast');
+    el.classList.add('show');
+    _tt = setTimeout(() => el.classList.remove('show'), 3200);
   }
 
-  /* ── Photo preview ── */
+  /* ── Photo preview (register form) ── */
   function previewPhoto(input) {
     const file = input.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-      photoDataURL = e.target.result;
-      const prev = document.getElementById('photoPreview');
+    const r = new FileReader();
+    r.onload = e => {
+      regPhotoDataURL = e.target.result;
+      const img  = document.getElementById('photoPreview');
       const icon = document.getElementById('photoIcon');
-      prev.src = photoDataURL;
-      prev.style.display = 'block';
+      img.src = regPhotoDataURL;
+      img.style.display = 'block';
       icon.style.display = 'none';
+      document.getElementById('photoThumb').style.background = 'transparent';
+      toast('Photo selected!');
     };
-    reader.readAsDataURL(file);
+    r.readAsDataURL(file);
   }
 
-  /* ── Page navigation ── */
+  /* ── Update photo on dashboard ── */
+  function updateDashPhoto(input) {
+    const file = input.files[0];
+    if (!file || !currentUser) return;
+    const r = new FileReader();
+    r.onload = e => {
+      currentUser.photo = e.target.result;
+      const idx = users.findIndex(u => u.email === currentUser.email);
+      if (idx > -1) users[idx].photo = currentUser.photo;
+      saveUsers();
+      applyDashPhoto(currentUser.photo);
+      toast('Profile photo updated!');
+    };
+    r.readAsDataURL(file);
+  }
+
+  function applyDashPhoto(src) {
+    const img = document.getElementById('dashPhotoImg');
+    const ini = document.getElementById('dashInitials');
+    if (src) {
+      img.src = src; img.style.display = 'block'; ini.style.display = 'none';
+    } else {
+      img.style.display = 'none'; ini.style.display = 'block';
+    }
+  }
+
+  /* ── Navigation ── */
   function showPage(id) {
     ['registerPage','loginPage','dashPage'].forEach(p =>
       document.getElementById(p).classList.add('hidden')
     );
     document.getElementById(id).classList.remove('hidden');
-    // Scroll to top on every page switch
-    try { document.getElementById(id).scrollTo(0,0); } catch(e){}
     window.scrollTo(0,0);
   }
   function showLogin()    { showPage('loginPage'); }
   function showRegister() { showPage('registerPage'); }
 
-  /* ── Validation helper ── */
-  function validate(inputId, errId, condition) {
-    const errEl = document.getElementById(errId);
-    if (!condition) {
-      errEl.style.display = 'block';
-      document.getElementById(inputId).style.borderColor = 'var(--danger)';
+  /* ── Field validation ── */
+  function vld(inputId, errId, ok) {
+    const e = document.getElementById(errId);
+    const i = document.getElementById(inputId);
+    if (!ok) {
+      e.classList.add('show');
+      i.style.borderColor = 'var(--red)';
+      i.style.boxShadow = '0 0 0 3px rgba(220,38,38,.12)';
       return false;
     }
-    errEl.style.display = 'none';
-    document.getElementById(inputId).style.borderColor = '';
+    e.classList.remove('show');
+    i.style.borderColor = ''; i.style.boxShadow = '';
     return true;
   }
 
   /* ── Register ── */
   function register() {
-    const firstName  = document.getElementById('regFirstName').value.trim();
-    const lastName   = document.getElementById('regLastName').value.trim();
-    const email      = document.getElementById('regEmail').value.trim();
-    const studentId  = document.getElementById('regStudentId').value.trim();
-    const password   = document.getElementById('regPassword').value;
-    const confirm    = document.getElementById('regConfirm').value;
+    const fn  = document.getElementById('regFirstName').value.trim();
+    const ln  = document.getElementById('regLastName').value.trim();
+    const em  = document.getElementById('regEmail').value.trim();
+    const sid = document.getElementById('regStudentId').value.trim();
+    const pw  = document.getElementById('regPassword').value;
+    const cf  = document.getElementById('regConfirm').value;
 
-    let allOk = true;
-    allOk = validate('regFirstName', 'errFirstName', firstName.length > 0)           && allOk;
-    allOk = validate('regLastName',  'errLastName',  lastName.length > 0)            && allOk;
-    allOk = validate('regEmail',     'errEmail',     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) && allOk;
-    allOk = validate('regStudentId', 'errStudentId', studentId.length > 0)           && allOk;
-    allOk = validate('regPassword',  'errPassword',  password.length >= 6)           && allOk;
-    allOk = validate('regConfirm',   'errConfirm',   password === confirm)           && allOk;
-    if (!allOk) return;
+    let ok = true;
+    ok = vld('regFirstName','errFirstName', fn) && ok;
+    ok = vld('regLastName', 'errLastName',  ln) && ok;
+    ok = vld('regEmail',    'errEmail',     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) && ok;
+    ok = vld('regStudentId','errStudentId', sid) && ok;
+    ok = vld('regPassword', 'errPassword',  pw.length >= 6) && ok;
+    ok = vld('regConfirm',  'errConfirm',   pw === cf) && ok;
+    if (!ok) return;
 
-    // Check duplicate email
-    if (users.some(u => u.email.toLowerCase() === email.toLowerCase())) {
-      showToast('Email already registered — please sign in.');
-      showLogin();
-      return;
+    if (users.some(u => u.email.toLowerCase() === em.toLowerCase())) {
+      toast('Email already registered — please sign in.');
+      setTimeout(showLogin, 1200); return;
     }
 
-    const newUser = {
-      firstName,
-      lastName,
-      middleName : document.getElementById('regMiddleName').value.trim(),
-      suffix     : document.getElementById('regSuffix').value,
-      email,
-      studentId,
-      password,
-      yearLevel  : document.getElementById('regYear').value,
-      age        : document.getElementById('regAge').value,
-      gender     : document.getElementById('regGender').value,
-      birthday   : document.getElementById('regBirthday').value,
-      civilStatus: document.getElementById('regCivil').value,
-      contact    : document.getElementById('regContact').value.trim(),
-      address    : document.getElementById('regAddress').value.trim(),
-      bio        : document.getElementById('regBio').value.trim(),
-      photo      : photoDataURL,
-    };
+    users.push({
+      firstName:  fn,
+      lastName:   ln,
+      middleName: document.getElementById('regMiddleName').value.trim(),
+      suffix:     document.getElementById('regSuffix').value,
+      email: em, studentId: sid, password: pw,
+      yearLevel:  document.getElementById('regYear').value,
+      age:        document.getElementById('regAge').value,
+      gender:     document.getElementById('regGender').value,
+      birthday:   document.getElementById('regBirthday').value,
+      civilStatus:document.getElementById('regCivil').value,
+      contact:    document.getElementById('regContact').value.trim(),
+      address:    document.getElementById('regAddress').value.trim(),
+      bio:        document.getElementById('regBio').value.trim(),
+      photo:      regPhotoDataURL,
+    });
 
-    users.push(newUser);
     saveUsers();
-    photoDataURL = '';   // reset for next registration
+    regPhotoDataURL = '';
+    // Reset photo preview for next use
+    document.getElementById('photoPreview').src = '';
+    document.getElementById('photoPreview').style.display = 'none';
+    document.getElementById('photoIcon').style.display = 'block';
+    document.getElementById('photoThumb').style.background = '';
+    document.getElementById('photoInput').value = '';
 
-    showToast('Account created! You can now sign in.');
-    showLogin();
+    toast('Account created! You can now sign in.');
+    setTimeout(showLogin, 900);
   }
 
   /* ── Login ── */
   function login() {
-    const email    = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value;
-    const errTxt   = document.getElementById('loginErrTxt');
-    const errIcon  = document.getElementById('loginErrIcon');
-
-    const user = users.find(u =>
-      u.email.toLowerCase() === email.toLowerCase() && u.password === password
-    );
+    const em = document.getElementById('loginEmail').value.trim();
+    const pw = document.getElementById('loginPassword').value;
+    const user = users.find(u => u.email.toLowerCase() === em.toLowerCase() && u.password === pw);
 
     if (!user) {
-      errTxt.textContent   = 'Incorrect email or password. Please try again.';
-      errIcon.style.display = 'inline';
-      // Shake animation
-      const card = document.querySelector('#loginPage .login-card');
-      card.animate([
-        { transform: 'translateX(0)' },
-        { transform: 'translateX(-8px)' },
-        { transform: 'translateX(8px)' },
-        { transform: 'translateX(-6px)' },
-        { transform: 'translateX(6px)' },
-        { transform: 'translateX(0)' }
-      ], { duration: 350, easing: 'ease-out' });
+      document.getElementById('loginErrTxt').textContent = 'Incorrect email or password.';
+      document.getElementById('loginErrIcon').style.display = 'inline';
+      document.querySelector('#loginPage .card').animate([
+        {transform:'translateX(0)'},{transform:'translateX(-7px)'},
+        {transform:'translateX(7px)'},{transform:'translateX(-5px)'},
+        {transform:'translateX(5px)'},{transform:'translateX(0)'}
+      ], {duration:320, easing:'ease-out'});
       return;
     }
-
-    errTxt.textContent    = '';
-    errIcon.style.display = 'none';
+    document.getElementById('loginErrTxt').textContent = '';
+    document.getElementById('loginErrIcon').style.display = 'none';
     currentUser = user;
-    populateDashboard(user);
+    populateDash(user);
     showPage('dashPage');
-    showToast('Welcome back, ' + user.firstName + '!');
+    toast('Welcome back, ' + user.firstName + '!');
   }
 
-  /* ── Populate Dashboard ── */
-  function populateDashboard(u) {
-    // Build full name
+  /* ── Populate dashboard ── */
+  function populateDash(u) {
     const parts = [u.firstName];
     if (u.middleName) parts.push(u.middleName);
     parts.push(u.lastName);
     if (u.suffix) parts.push(u.suffix);
     const fullName = parts.join(' ');
 
-    // Hero
-    document.getElementById('dashName').textContent     = fullName;
-    document.getElementById('dashSubtitle').textContent = 'Student ID ' + (u.studentId || '—') + '  ·  ' + (u.email || '—');
-    document.getElementById('dashYearTag').textContent  = u.yearLevel || '2nd Year';
-    document.getElementById('dashYearStat').textContent = (u.yearLevel || '2nd').replace(' Year','');
+    document.getElementById('dashName').textContent      = fullName;
+    document.getElementById('dashIdMeta').textContent    = 'ID ' + (u.studentId || '—');
+    document.getElementById('dashEmailMeta').textContent = u.email;
+    document.getElementById('dashYearTag').textContent   = u.yearLevel || '2nd Year';
+    document.getElementById('dashYearStat').textContent  = (u.yearLevel||'2nd').replace(' Year','');
+    document.getElementById('dashInitials').textContent  = (u.firstName[0]||'') + (u.lastName[0]||'');
+    applyDashPhoto(u.photo);
 
-    // Photo
-    const img = document.getElementById('dashAvatarImg');
-    const ph  = document.getElementById('dashAvatarPlaceholder');
-    if (u.photo) {
-      img.src = u.photo;
-      img.style.display = 'block';
-      ph.style.display  = 'none';
-    } else {
-      ph.textContent    = (u.firstName[0] || '') + (u.lastName[0] || '');
-      ph.style.display  = 'flex';
-      img.style.display = 'none';
-    }
-
-    // Personal
     document.getElementById('di-fullname').textContent = fullName;
-    document.getElementById('di-bday').textContent     = u.birthday   ? formatDate(u.birthday) : '—';
-    document.getElementById('di-age').textContent      = u.age        ? u.age + ' years old'    : '—';
-    document.getElementById('di-gender').textContent   = u.gender     || '—';
+    document.getElementById('di-bday').textContent     = u.birthday    ? fmtDate(u.birthday) : '—';
+    document.getElementById('di-age').textContent      = u.age         ? u.age + ' years old' : '—';
+    document.getElementById('di-gender').textContent   = u.gender      || '—';
     document.getElementById('di-civil').textContent    = u.civilStatus || '—';
-
-    // Contact & School
-    document.getElementById('di-id').textContent      = u.studentId || '—';
-    document.getElementById('di-year').textContent    = u.yearLevel  || '—';
-    document.getElementById('di-email').textContent   = u.email;
-    document.getElementById('di-contact').textContent = u.contact   || '—';
-    document.getElementById('di-address').textContent = u.address   || '—';
-
-    // Bio
-    document.getElementById('di-bio').textContent = u.bio || 'No bio provided.';
+    document.getElementById('di-id').textContent       = u.studentId   || '—';
+    document.getElementById('di-year').textContent     = u.yearLevel   || '—';
+    document.getElementById('di-email').textContent    = u.email;
+    document.getElementById('di-contact').textContent  = u.contact     || '—';
+    document.getElementById('di-address').textContent  = u.address     || '—';
+    document.getElementById('di-bio').textContent      = u.bio         || 'No bio provided.';
   }
 
-  /* ── Date formatter ── */
-  function formatDate(dateStr) {
-    if (!dateStr) return '—';
-    const [y, m, d] = dateStr.split('-');
-    const months = ['January','February','March','April','May','June',
-                    'July','August','September','October','November','December'];
-    return months[+m - 1] + ' ' + +d + ', ' + y;
+  function fmtDate(s) {
+    if (!s) return '—';
+    const [y,m,d] = s.split('-');
+    const mo = ['January','February','March','April','May','June',
+                'July','August','September','October','November','December'];
+    return mo[+m-1] + ' ' + +d + ', ' + y;
   }
 
   /* ── Logout ── */
@@ -964,18 +1048,16 @@
     showLogin();
   }
 
-  /* ── Live clock ── */
-  function updateClock() {
-    const now = new Date();
+  /* ── Clock ── */
+  (function tick() {
     document.getElementById('clockEl').textContent =
-      now.toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  }
-  setInterval(updateClock, 1000);
-  updateClock();
+      new Date().toLocaleTimeString('en-PH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    setTimeout(tick, 1000);
+  })();
 
-  /* ── Clear red border on input ── */
-  document.querySelectorAll('input, select, textarea').forEach(el => {
-    el.addEventListener('input', () => { el.style.borderColor = ''; });
+  /* ── Clear errors on input ── */
+  document.querySelectorAll('input,select,textarea').forEach(el => {
+    el.addEventListener('input', () => { el.style.borderColor=''; el.style.boxShadow=''; });
   });
 </script>
 </body>
